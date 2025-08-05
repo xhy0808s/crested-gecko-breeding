@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="게코 브리딩">
+    <title>🦎 게코 브리딩</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1a202c;
+            overflow-x: hidden;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 앱 헤더 */
+        .app-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 20px 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .app-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .app-header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* 메인 콘텐츠 */
+        .app-content {
+            flex: 1;
+            padding: 20px;
+            padding-bottom: 100px; /* 하단 네비게이션 공간 */
+        }
+
+        /* 통계 카드 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        /* 메뉴 그리드 */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .menu-item {
+            background: white;
+            border-radius: 20px;
+            padding: 25px 20px;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            touch-action: manipulation;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-item:active {
+            transform: scale(0.95);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .menu-item:active::before {
+            opacity: 1;
+        }
+
+        .menu-item i {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .menu-item h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .menu-item p {
+            font-size: 0.8rem;
+            color: #718096;
+            line-height: 1.4;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 메뉴 아이템 색상 */
+        .menu-item.primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .menu-item.success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .menu-item.warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .menu-item.info {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+
+        .menu-item.dark {
+            background: linear-gradient(135deg, #374151, #1f2937);
+            color: white;
+        }
+
+        /* 하단 네비게이션 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 12px 0;
+            display: flex;
+            justify-content: space-around;
+            z-index: 100;
+            padding-bottom: max(12px, env(safe-area-inset-bottom));
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            min-width: 60px;
+            position: relative;
+        }
+
+        .nav-item.active {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+
+        .nav-item i {
+            font-size: 1.3rem;
+            margin-bottom: 4px;
+        }
+
+        .nav-item span {
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        /* 알림 */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 16px 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+            z-index: 1000;
+            animation: slideInDown 0.5s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .notification i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* 로딩 애니메이션 */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* 반응형 */
+        @media (max-width: 360px) {
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 터치 최적화 */
+        .menu-item,
+        .nav-item {
+            min-height: 44px;
+            touch-action: manipulation;
+        }
+
+        /* 스크롤 최적화 */
+        .app-content {
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* 앱 아이콘 */
+        .app-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            margin: 0 auto 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 앱 헤더 -->
+        <div class="app-header">
+            <div class="app-icon">🦎</div>
+            <h1>게코 브리딩</h1>
+            <p>크레스티드 게코 관리 앱</p>
+        </div>
+
+        <!-- 메인 콘텐츠 -->
+        <div class="app-content">
+            <!-- 통계 -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalAnimals">0</div>
+                    <div class="stat-label">등록된 개체</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalGenerations">5</div>
+                    <div class="stat-label">세대 관리</div>
+                </div>
+            </div>
+
+            <!-- 메뉴 -->
+            <div class="menu-grid">
+                <div class="menu-item primary" onclick="showAnimalRegistration()">
+                    <i class="fas fa-plus-circle"></i>
+                    <h3>개체 등록</h3>
+                    <p>새로운 게코 등록</p>
+                </div>
+                
+                <div class="menu-item" onclick="showAnimalList()">
+                    <i class="fas fa-list"></i>
+                    <h3>개체 목록</h3>
+                    <p>등록된 개체 확인</p>
+                </div>
+                
+                <div class="menu-item success" onclick="showFamilyTree()">
+                    <i class="fas fa-tree"></i>
+                    <h3>가족 관계도</h3>
+                    <p>혈통 관계 확인</p>
+                </div>
+                
+                <div class="menu-item warning" onclick="showHatchingManagement()">
+                    <i class="fas fa-egg"></i>
+                    <h3>해칭 관리</h3>
+                    <p>알 관리 및 추적</p>
+                </div>
+                
+                <div class="menu-item info" onclick="showDataSync()">
+                    <i class="fas fa-sync-alt"></i>
+                    <h3>데이터 동기화</h3>
+                    <p>기기 간 데이터 공유</p>
+                </div>
+                
+                <div class="menu-item dark" onclick="showMarketplace()">
+                    <i class="fas fa-store"></i>
+                    <h3>마켓플레이스</h3>
+                    <p>거래 및 분양</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 하단 네비게이션 -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="showHome()">
+                <i class="fas fa-home"></i>
+                <span>홈</span>
+            </div>
+            <div class="nav-item" onclick="showAnimalRegistration()">
+                <i class="fas fa-plus"></i>
+                <span>등록</span>
+            </div>
+            <div class="nav-item" onclick="showAnimalList()">
+                <i class="fas fa-list"></i>
+                <span>목록</span>
+            </div>
+            <div class="nav-item" onclick="showFamilyTree()">
+                <i class="fas fa-tree"></i>
+                <span>관계도</span>
+            </div>
+            <div class="nav-item" onclick="showSettings()">
+                <i class="fas fa-cog"></i>
+                <span>설정</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 개인 사용자 설정
+        const user = {
+            name: '개인 사용자',
+            createdAt: new Date().toISOString()
+        };
+
+        // 로컬 스토리지에 사용자 정보 저장
+        localStorage.setItem('currentUser', JSON.stringify(user));
+
+        // 자동 동기화 기능
+        function setupAutoSync() {
+            // 로컬 스토리지 변경 감지
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'animals') {
+                    console.log('🔄 데이터 동기화 감지됨');
+                    updateStats();
+                    showNotification('데이터가 자동으로 동기화되었습니다');
+                }
+            });
+            
+            // 주기적 동기화 (3초마다)
+            setInterval(function() {
+                updateStats();
+            }, 3000);
+        }
+
+        // 알림 표시
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = `
+                <i class="fas fa-sync-alt"></i>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // 통계 업데이트
+        function updateStats() {
+            const animals = JSON.parse(localStorage.getItem('animals') || '[]');
+            document.getElementById('totalAnimals').textContent = animals.length;
+        }
+
+        // 기존 데이터 복원 함수
+        function restoreDataIfNeeded() {
+            const animals = JSON.parse(localStorage.getItem('animals') || '[]');
+            
+            // 데이터가 없으면 샘플 데이터 생성
+            if (animals.length === 0) {
+                const sampleAnimals = [
+                    {
+                        id: '1',
+                        name: '크림',
+                        gender: '수컷',
+                        generation: 'F1',
+                        status: '활성',
+                        morph: '크림',
+                        father: '',
+                        mother: '',
+                        notes: '첫 번째 등록된 게코',
+                        image: '',
+                        createdAt: new Date().toISOString()
+                    },
+                    {
+                        id: '2',
+                        name: '스노우',
+                        gender: '암컷',
+                        generation: 'F1',
+                        status: '활성',
+                        morph: '스노우',
+                        father: '',
+                        mother: '',
+                        notes: '두 번째 등록된 게코',
+                        image: '',
+                        createdAt: new Date().toISOString()
+                    }
+                ];
+                
+                localStorage.setItem('animals', JSON.stringify(sampleAnimals));
+                console.log('샘플 데이터가 생성되었습니다.');
+                showNotification('샘플 데이터가 생성되었습니다!');
+            }
+        }
+
+        // 네비게이션 함수들
+        function showHome() {
+            // 현재 페이지이므로 아무것도 하지 않음
+            setActiveNav(0);
+        }
+
+        function showAnimalRegistration() {
+            window.location.href = 'register.html';
+        }
+
+        function showAnimalList() {
+            window.location.href = 'list-fixed.html';
+        }
+
+        function showFamilyTree() {
+            window.location.href = 'tree.html';
+        }
+
+        function showHatchingManagement() {
+            window.location.href = 'hatching.html';
+        }
+
+        function showDataSync() {
+            window.location.href = 'sync-data.html';
+        }
+
+        function showMarketplace() {
+            window.location.href = 'marketplace.html';
+        }
+
+        function showSettings() {
+            showNotification('설정 기능은 준비 중입니다');
+        }
+
+        // 하단 네비게이션 활성화
+        function setActiveNav(index) {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach((item, i) => {
+                item.classList.toggle('active', i === index);
+            });
+        }
+
+        // 페이지 로드 시 초기화
+        window.onload = function() {
+            restoreDataIfNeeded();
+            updateStats();
+            setupAutoSync();
+            setActiveNav(0); // 홈 활성화
+        };
+    </script>
+</body>
+</html> 
