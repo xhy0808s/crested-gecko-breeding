@@ -35,57 +35,101 @@
         .app-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 20px 20px 15px;
+            padding: 15px 20px;
             position: sticky;
             top: 0;
             z-index: 100;
             box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
         }
 
-        .app-header h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 5px;
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        .app-header p {
-            font-size: 0.9rem;
+        .app-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .app-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .title-text h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .title-text p {
+            font-size: 0.8rem;
             opacity: 0.9;
+        }
+
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .sync-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
         /* 메인 콘텐츠 */
         .app-content {
             flex: 1;
             padding: 20px;
-            padding-bottom: 100px; /* 하단 네비게이션 공간 */
+            padding-bottom: 100px;
         }
 
         /* 통계 카드 */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 25px;
+            gap: 12px;
+            margin-bottom: 20px;
         }
 
         .stat-card {
             background: white;
             border-radius: 16px;
-            padding: 20px;
+            padding: 16px;
             text-align: center;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .stat-number {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 800;
             color: #667eea;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .stat-label {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: #718096;
             font-weight: 500;
         }
@@ -94,19 +138,19 @@
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+            gap: 12px;
         }
 
         .menu-item {
             background: white;
-            border-radius: 20px;
-            padding: 25px 20px;
+            border-radius: 16px;
+            padding: 20px 16px;
             text-align: center;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             border: 1px solid rgba(0, 0, 0, 0.05);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
-            min-height: 140px;
+            min-height: 100px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -118,7 +162,7 @@
 
         .menu-item:active {
             transform: scale(0.95);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
         }
 
         .menu-item::before {
@@ -138,24 +182,24 @@
         }
 
         .menu-item i {
-            font-size: 2.5rem;
-            margin-bottom: 12px;
+            font-size: 2rem;
+            margin-bottom: 8px;
             position: relative;
             z-index: 1;
         }
 
         .menu-item h3 {
-            font-size: 1.1rem;
+            font-size: 0.9rem;
             font-weight: 600;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             position: relative;
             z-index: 1;
         }
 
         .menu-item p {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             color: #718096;
-            line-height: 1.4;
+            line-height: 1.3;
             position: relative;
             z-index: 1;
         }
@@ -195,22 +239,22 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             border-top: 1px solid rgba(0, 0, 0, 0.1);
-            padding: 12px 0;
+            padding: 8px 0;
             display: flex;
             justify-content: space-around;
             z-index: 100;
-            padding-bottom: max(12px, env(safe-area-inset-bottom));
+            padding-bottom: max(8px, env(safe-area-inset-bottom));
         }
 
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 8px 12px;
+            padding: 6px 8px;
             border-radius: 12px;
             transition: all 0.3s ease;
             cursor: pointer;
-            min-width: 60px;
+            min-width: 50px;
             position: relative;
         }
 
@@ -220,12 +264,12 @@
         }
 
         .nav-item i {
-            font-size: 1.3rem;
-            margin-bottom: 4px;
+            font-size: 1.2rem;
+            margin-bottom: 3px;
         }
 
         .nav-item span {
-            font-size: 0.7rem;
+            font-size: 0.6rem;
             font-weight: 600;
         }
 
@@ -237,16 +281,16 @@
             right: 20px;
             background: linear-gradient(135deg, #10b981, #059669);
             color: white;
-            padding: 16px 20px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+            padding: 14px 18px;
+            border-radius: 14px;
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
             z-index: 1000;
             animation: slideInDown 0.5s ease-out;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         @keyframes slideInDown {
@@ -267,23 +311,6 @@
         @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
-        }
-
-        /* 로딩 애니메이션 */
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 200px;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f4f6;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
         }
 
         /* 반응형 */
@@ -309,18 +336,32 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* 앱 아이콘 */
-        .app-icon {
-            width: 60px;
-            height: 60px;
+        /* 빠른 액션 버튼 */
+        .quick-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .quick-action {
+            flex: 1;
             background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 16px;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
-            color: white;
-            margin: 0 auto 15px;
+            gap: 8px;
+        }
+
+        .quick-action:active {
+            transform: scale(0.95);
         }
     </style>
 </head>
@@ -328,9 +369,19 @@
     <div class="app-container">
         <!-- 앱 헤더 -->
         <div class="app-header">
-            <div class="app-icon">🦎</div>
-            <h1>게코 브리딩</h1>
-            <p>크레스티드 게코 관리 앱</p>
+            <div class="header-content">
+                <div class="app-title">
+                    <div class="app-icon">🦎</div>
+                    <div class="title-text">
+                        <h1>게코 브리딩</h1>
+                        <p>개인용 관리 시스템</p>
+                    </div>
+                </div>
+                <div class="sync-status">
+                    <div class="sync-indicator"></div>
+                    <span>동기화됨</span>
+                </div>
+            </div>
         </div>
 
         <!-- 메인 콘텐츠 -->
@@ -352,38 +403,50 @@
                 <div class="menu-item primary" onclick="showAnimalRegistration()">
                     <i class="fas fa-plus-circle"></i>
                     <h3>개체 등록</h3>
-                    <p>새로운 게코 등록</p>
+                    <p>새 게코 등록</p>
                 </div>
                 
                 <div class="menu-item" onclick="showAnimalList()">
                     <i class="fas fa-list"></i>
                     <h3>개체 목록</h3>
-                    <p>등록된 개체 확인</p>
+                    <p>등록된 개체</p>
                 </div>
                 
                 <div class="menu-item success" onclick="showFamilyTree()">
                     <i class="fas fa-tree"></i>
                     <h3>가족 관계도</h3>
-                    <p>혈통 관계 확인</p>
+                    <p>혈통 확인</p>
                 </div>
                 
                 <div class="menu-item warning" onclick="showHatchingManagement()">
                     <i class="fas fa-egg"></i>
                     <h3>해칭 관리</h3>
-                    <p>알 관리 및 추적</p>
+                    <p>알 관리</p>
                 </div>
                 
                 <div class="menu-item info" onclick="showDataSync()">
                     <i class="fas fa-sync-alt"></i>
                     <h3>데이터 동기화</h3>
-                    <p>기기 간 데이터 공유</p>
+                    <p>기기 간 공유</p>
                 </div>
                 
                 <div class="menu-item dark" onclick="showMarketplace()">
                     <i class="fas fa-store"></i>
                     <h3>마켓플레이스</h3>
-                    <p>거래 및 분양</p>
+                    <p>거래 분양</p>
                 </div>
+            </div>
+
+            <!-- 빠른 액션 -->
+            <div class="quick-actions">
+                <button class="quick-action" onclick="showAnimalRegistration()">
+                    <i class="fas fa-plus"></i>
+                    새 개체 등록
+                </button>
+                <button class="quick-action" onclick="showAnimalList()">
+                    <i class="fas fa-list"></i>
+                    목록 보기
+                </button>
             </div>
         </div>
 
@@ -427,21 +490,6 @@
         function setupAutoSync() {
             // auto-sync.js에서 자동으로 처리됨
             console.log('자동 동기화 시스템이 활성화되었습니다');
-        }
-
-        // 알림 표시
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.innerHTML = `
-                <i class="fas fa-sync-alt"></i>
-                <span>${message}</span>
-            `;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
         }
 
         // 통계 업데이트
@@ -523,6 +571,21 @@
 
         function showSettings() {
             showNotification('설정 기능은 준비 중입니다');
+        }
+
+        // 알림 표시
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = `
+                <i class="fas fa-sync-alt"></i>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
         }
 
         // 하단 네비게이션 활성화
