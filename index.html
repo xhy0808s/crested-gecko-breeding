@@ -406,6 +406,13 @@
             showDeviceInfo(device);
             redirectToAppropriatePage(device);
             
+            // Firebase 자동 설정 스크립트 로드
+            if (typeof window.firebaseSetup === 'undefined') {
+                const setupScript = document.createElement('script');
+                setupScript.src = 'auto-firebase-setup.js';
+                document.head.appendChild(setupScript);
+            }
+            
             // 서버 기반 동기화 시스템 로드
             if (typeof window.serverSync === 'undefined') {
                 const script = document.createElement('script');
