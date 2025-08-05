@@ -406,10 +406,10 @@
             showDeviceInfo(device);
             redirectToAppropriatePage(device);
             
-            // 간단한 실시간 동기화 시스템 로드
-            if (typeof window.simpleSync === 'undefined') {
+            // 완전한 동기화 시스템 로드
+            if (typeof window.completeSync === 'undefined') {
                 const script = document.createElement('script');
-                script.src = 'simple-sync.js';
+                script.src = 'complete-sync.js';
                 document.head.appendChild(script);
             }
             

@@ -827,14 +827,18 @@
             }
 
             try {
-                // 기존 데이터 로드
-                const animals = JSON.parse(localStorage.getItem('animals') || '[]');
-                
-                // 새 개체 추가
-                animals.push(formData);
-                
-                // 로컬 스토리지에 저장
-                localStorage.setItem('animals', JSON.stringify(animals));
+                // 완전한 동기화 시스템을 통한 개체 등록
+                if (window.completeSync) {
+                    const success = window.completeSync.registerAnimal(formData);
+                    if (!success) {
+                        throw new Error('동기화 시스템 오류');
+                    }
+                } else {
+                    // 폴백: 기존 방식
+                    const animals = JSON.parse(localStorage.getItem('animals') || '[]');
+                    animals.push(formData);
+                    localStorage.setItem('animals', JSON.stringify(animals));
+                }
             } catch (error) {
                 if (error.name === 'QuotaExceededError') {
                     showStatus('저장 공간이 부족합니다. clear-storage.html 페이지에서 데이터를 정리해주세요.', 'error');
@@ -889,6 +893,7 @@
             }
         }
     </script>
+    <script src="complete-sync.js"></script>
     <script src="image-sync.js"></script>
 </body>
 </html> 
