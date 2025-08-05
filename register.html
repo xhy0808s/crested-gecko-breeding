@@ -827,8 +827,14 @@
             }
 
             try {
-                // 완전한 동기화 시스템을 통한 개체 등록
-                if (window.completeSync) {
+                // 서버 기반 동기화 시스템을 통한 개체 등록
+                if (window.serverSync) {
+                    const success = await window.serverSync.registerAnimal(formData);
+                    if (!success) {
+                        throw new Error('서버 동기화 시스템 오류');
+                    }
+                } else if (window.completeSync) {
+                    // 폴백: 완전한 동기화 시스템
                     const success = window.completeSync.registerAnimal(formData);
                     if (!success) {
                         throw new Error('동기화 시스템 오류');
@@ -893,7 +899,7 @@
             }
         }
     </script>
-    <script src="complete-sync.js"></script>
+    <script src="server-sync.js"></script>
     <script src="image-sync.js"></script>
 </body>
 </html> 
