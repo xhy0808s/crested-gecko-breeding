@@ -1,0 +1,20 @@
+# Netlify 리다이렉트 설정
+# 이 파일을 _redirects로 저장하세요
+
+# 메인 페이지
+/ /index.html 200
+
+# 모바일 앱 페이지
+/mobile /mobile-app.html 200
+/app /mobile-app.html 200
+
+# 기타 페이지들
+/register /register.html 200
+/list /list-fixed.html 200
+/tree /tree.html 200
+/hatching /hatching.html 200
+/sync /sync-data.html 200
+/marketplace /marketplace.html 200
+
+# 404 페이지
+/* /index.html 404 
