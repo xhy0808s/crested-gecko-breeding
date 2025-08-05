@@ -1,11 +1,13 @@
 [build]
   publish = "."
 
+# 메인 페이지 리다이렉트
 [[redirects]]
   from = "/"
   to = "/index.html"
   status = 200
 
+# 모바일 앱 페이지들
 [[redirects]]
   from = "/mobile"
   to = "/mobile-app.html"
@@ -16,17 +18,75 @@
   to = "/mobile-app.html"
   status = 200
 
+# 테스트 모드 페이지들
+[[redirects]]
+  from = "/test"
+  to = "/mobile-test.html"
+  status = 200
+
+[[redirects]]
+  from = "/test-mode"
+  to = "/test-mode.html"
+  status = 200
+
+# 기타 페이지들
+[[redirects]]
+  from = "/register"
+  to = "/register.html"
+  status = 200
+
+[[redirects]]
+  from = "/list"
+  to = "/list-fixed.html"
+  status = 200
+
+[[redirects]]
+  from = "/tree"
+  to = "/tree.html"
+  status = 200
+
+[[redirects]]
+  from = "/hatching"
+  to = "/hatching.html"
+  status = 200
+
+[[redirects]]
+  from = "/sync"
+  to = "/sync-data.html"
+  status = 200
+
+[[redirects]]
+  from = "/marketplace"
+  to = "/marketplace.html"
+  status = 200
+
+# 404 처리 - 모든 다른 경로를 index.html로 리다이렉트
 [[redirects]]
   from = "/*"
   to = "/index.html"
-  status = 404
+  status = 200
 
 [build.environment]
   NODE_VERSION = "18"
 
+# 캐시 설정
 [[headers]]
   for = "/*"
   [headers.values]
     Cache-Control = "no-cache, no-store, must-revalidate"
     Pragma = "no-cache"
-    Expires = "0" 
+    Expires = "0"
+
+# HTML 파일에 대한 특별한 헤더
+[[headers]]
+  for = "*.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+# JavaScript 파일에 대한 헤더
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=3600" 
