@@ -403,38 +403,40 @@
                 <div class="menu-item primary" onclick="showAnimalRegistration()">
                     <i class="fas fa-plus-circle"></i>
                     <h3>개체 등록</h3>
-                    <p>새 게코 등록</p>
+                    <p>F1~F5 세대 등록</p>
                 </div>
                 
                 <div class="menu-item" onclick="showAnimalList()">
                     <i class="fas fa-list"></i>
                     <h3>개체 목록</h3>
-                    <p>등록된 개체</p>
+                    <p>등록된 개체 관리</p>
                 </div>
                 
-                <div class="menu-item success" onclick="showFamilyTree()">
-                    <i class="fas fa-tree"></i>
-                    <h3>가족 관계도</h3>
-                    <p>혈통 확인</p>
+                <div class="menu-item success" onclick="showMorphCalculator()">
+                    <i class="fas fa-calculator"></i>
+                    <h3>모프 계산기</h3>
+                    <p>부모 모프 계산</p>
                 </div>
                 
-                <div class="menu-item warning" onclick="showHatchingManagement()">
+                <div class="menu-item warning" onclick="showFamilyTreeViewer()">
+                    <i class="fas fa-sitemap"></i>
+                    <h3>가족 관계 확인</h3>
+                    <p>F1~F5 세대 관계</p>
+                </div>
+                
+                <div class="menu-item info" onclick="showHatchingManagement()">
                     <i class="fas fa-egg"></i>
                     <h3>해칭 관리</h3>
-                    <p>알 관리</p>
+                    <p>알 관리 및 일정</p>
                 </div>
                 
-                <div class="menu-item info" onclick="showDataSync()">
+                <div class="menu-item dark" onclick="showDataSync()">
                     <i class="fas fa-sync-alt"></i>
                     <h3>데이터 동기화</h3>
-                    <p>기기 간 공유</p>
+                    <p>PC와 모바일 동기화</p>
                 </div>
                 
-                <div class="menu-item dark" onclick="showMarketplace()">
-                    <i class="fas fa-store"></i>
-                    <h3>마켓플레이스</h3>
-                    <p>거래 분양</p>
-                </div>
+
             </div>
 
             <!-- 빠른 액션 -->
@@ -556,8 +558,12 @@
             window.location.href = 'list-fixed.html';
         }
 
-        function showFamilyTree() {
-            window.location.href = 'tree.html';
+        function showMorphCalculator() {
+            window.location.href = 'morph-calculator.html';
+        }
+
+        function showFamilyTreeViewer() {
+            window.location.href = 'family-tree-viewer.html';
         }
 
         function showHatchingManagement() {
