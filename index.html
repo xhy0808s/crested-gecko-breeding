@@ -399,6 +399,11 @@
                 script.src = 'real-time-sync.js';
                 document.head.appendChild(script);
             }
+            
+            // 동기화 문제 해결 스크립트 로드
+            const fixScript = document.createElement('script');
+            fixScript.src = 'fix-sync.js';
+            document.head.appendChild(fixScript);
         };
     </script>
 </body>
