@@ -412,6 +412,7 @@
         </div>
     </div>
 
+    <script src="auto-sync.js"></script>
     <script>
         // 개인 사용자 설정
         const user = {
@@ -422,21 +423,10 @@
         // 로컬 스토리지에 사용자 정보 저장
         localStorage.setItem('currentUser', JSON.stringify(user));
 
-        // 자동 동기화 기능
+        // 자동 동기화 기능 (auto-sync.js에서 처리)
         function setupAutoSync() {
-            // 로컬 스토리지 변경 감지
-            window.addEventListener('storage', function(e) {
-                if (e.key === 'animals') {
-                    console.log('🔄 데이터 동기화 감지됨');
-                    updateStats();
-                    showNotification('데이터가 자동으로 동기화되었습니다');
-                }
-            });
-            
-            // 주기적 동기화 (3초마다)
-            setInterval(function() {
-                updateStats();
-            }, 3000);
+            // auto-sync.js에서 자동으로 처리됨
+            console.log('자동 동기화 시스템이 활성화되었습니다');
         }
 
         // 알림 표시
