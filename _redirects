@@ -8,6 +8,10 @@
 /mobile /mobile-app.html 200
 /app /mobile-app.html 200
 
+# 테스트 모드 페이지
+/test /mobile-test.html 200
+/test-mode /test-mode.html 200
+
 # 기타 페이지들
 /register /register.html 200
 /list /list-fixed.html 200

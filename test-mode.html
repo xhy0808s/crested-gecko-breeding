@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦎 게코 브리딩 - 개발자 테스트 모드</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a202c;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .test-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .test-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .test-header {
+            background: #2d3748;
+            padding: 15px;
+            border-bottom: 2px solid #4a5568;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .test-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .test-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .test-btn {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .test-btn:hover {
+            background: #3182ce;
+        }
+
+        .test-btn.danger {
+            background: #e53e3e;
+        }
+
+        .test-btn.danger:hover {
+            background: #c53030;
+        }
+
+        .test-btn.success {
+            background: #38a169;
+        }
+
+        .test-btn.success:hover {
+            background: #2f855a;
+        }
+
+        .test-frame {
+            flex: 1;
+            border: none;
+            background: white;
+        }
+
+        .mobile-frame {
+            width: 375px;
+            height: 100%;
+            border: 2px solid #4a5568;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .web-frame {
+            flex: 1;
+            border: 2px solid #4a5568;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px;
+        }
+
+        .sync-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #38a169;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sync-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #68d391;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .device-selector {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #2d3748;
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 1000;
+        }
+
+        .device-option {
+            display: block;
+            margin: 5px 0;
+            padding: 8px 12px;
+            background: #4a5568;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .device-option:hover {
+            background: #718096;
+        }
+
+        .device-option.active {
+            background: #4299e1;
+        }
+
+        .data-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: #2d3748;
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 1000;
+            max-width: 300px;
+        }
+
+        .data-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .data-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            font-size: 0.9rem;
+        }
+
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: #4299e1;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            z-index: 1000;
+            animation: slideInRight 0.5s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <!-- 모바일 테스트 패널 -->
+        <div class="test-panel">
+            <div class="test-header">
+                <div class="test-title">
+                    <i class="fas fa-mobile-alt"></i>
+                    모바일 테스트
+                </div>
+                <div class="test-controls">
+                    <button class="test-btn" onclick="refreshMobile()">
+                        <i class="fas fa-sync-alt"></i> 새로고침
+                    </button>
+                    <button class="test-btn success" onclick="addTestData()">
+                        <i class="fas fa-plus"></i> 테스트 데이터
+                    </button>
+                </div>
+            </div>
+            <div class="mobile-frame">
+                <iframe id="mobileFrame" class="test-frame" src="mobile-app.html"></iframe>
+            </div>
+        </div>
+
+        <!-- 웹 테스트 패널 -->
+        <div class="test-panel">
+            <div class="test-header">
+                <div class="test-title">
+                    <i class="fas fa-desktop"></i>
+                    웹 테스트
+                </div>
+                <div class="test-controls">
+                    <button class="test-btn" onclick="refreshWeb()">
+                        <i class="fas fa-sync-alt"></i> 새로고침
+                    </button>
+                    <button class="test-btn danger" onclick="clearData()">
+                        <i class="fas fa-trash"></i> 데이터 초기화
+                    </button>
+                </div>
+            </div>
+            <div class="web-frame">
+                <iframe id="webFrame" class="test-frame" src="index.html"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- 동기화 상태 표시 -->
+    <div class="sync-status">
+        <div class="sync-indicator"></div>
+        <span id="syncStatus">실시간 동기화 중...</span>
+    </div>
+
+    <!-- 디바이스 선택기 -->
+    <div class="device-selector">
+        <div style="font-weight: 600; margin-bottom: 10px;">디바이스 모드</div>
+        <button class="device-option active" onclick="setDeviceMode('mobile')">
+            <i class="fas fa-mobile-alt"></i> 모바일
+        </button>
+        <button class="device-option" onclick="setDeviceMode('tablet')">
+            <i class="fas fa-tablet-alt"></i> 태블릿
+        </button>
+        <button class="device-option" onclick="setDeviceMode('desktop')">
+            <i class="fas fa-desktop"></i> 데스크톱
+        </button>
+    </div>
+
+    <!-- 데이터 패널 -->
+    <div class="data-panel">
+        <div class="data-title">실시간 데이터</div>
+        <div class="data-item">
+            <span>등록된 개체:</span>
+            <span id="totalAnimals">0</span>
+        </div>
+        <div class="data-item">
+            <span>마지막 동기화:</span>
+            <span id="lastSync">-</span>
+        </div>
+        <div class="data-item">
+            <span>동기화 상태:</span>
+            <span id="syncState">온라인</span>
+        </div>
+    </div>
+
+    <script>
+        let currentDeviceMode = 'mobile';
+        let syncInterval;
+
+        // 페이지 로드 시 초기화
+        window.onload = function() {
+            setupSyncMonitoring();
+            updateDataPanel();
+            startSyncInterval();
+        };
+
+        // 동기화 모니터링 설정
+        function setupSyncMonitoring() {
+            // 로컬 스토리지 변경 감지
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'animals' || e.key === 'lastSync') {
+                    updateDataPanel();
+                    showNotification('데이터가 업데이트되었습니다');
+                }
+            });
+        }
+
+        // 데이터 패널 업데이트
+        function updateDataPanel() {
+            const animals = JSON.parse(localStorage.getItem('animals') || '[]');
+            const lastSync = localStorage.getItem('lastSync') || '-';
+            
+            document.getElementById('totalAnimals').textContent = animals.length;
+            document.getElementById('lastSync').textContent = lastSync !== '-' ? 
+                new Date(lastSync).toLocaleTimeString() : '-';
+        }
+
+        // 동기화 간격 시작
+        function startSyncInterval() {
+            syncInterval = setInterval(() => {
+                updateDataPanel();
+                updateSyncStatus();
+            }, 3000);
+        }
+
+        // 동기화 상태 업데이트
+        function updateSyncStatus() {
+            const isOnline = navigator.onLine;
+            const statusEl = document.getElementById('syncStatus');
+            const stateEl = document.getElementById('syncState');
+            
+            statusEl.textContent = isOnline ? '실시간 동기화 중...' : '오프라인 모드';
+            stateEl.textContent = isOnline ? '온라인' : '오프라인';
+        }
+
+        // 모바일 프레임 새로고침
+        function refreshMobile() {
+            const frame = document.getElementById('mobileFrame');
+            frame.src = frame.src;
+            showNotification('모바일 화면이 새로고침되었습니다');
+        }
+
+        // 웹 프레임 새로고침
+        function refreshWeb() {
+            const frame = document.getElementById('webFrame');
+            frame.src = frame.src;
+            showNotification('웹 화면이 새로고침되었습니다');
+        }
+
+        // 테스트 데이터 추가
+        function addTestData() {
+            const animals = JSON.parse(localStorage.getItem('animals') || '[]');
+            const newAnimal = {
+                id: Date.now().toString(),
+                name: `테스트 게코 ${animals.length + 1}`,
+                gender: Math.random() > 0.5 ? '수컷' : '암컷',
+                generation: 'F1',
+                status: '활성',
+                morph: '크림',
+                father: '',
+                mother: '',
+                notes: '테스트용 데이터',
+                image: '',
+                createdAt: new Date().toISOString()
+            };
+            
+            animals.push(newAnimal);
+            localStorage.setItem('animals', JSON.stringify(animals));
+            localStorage.setItem('lastSync', new Date().toISOString());
+            
+            updateDataPanel();
+            showNotification('테스트 데이터가 추가되었습니다');
+        }
+
+        // 데이터 초기화
+        function clearData() {
+            if (confirm('모든 데이터를 초기화하시겠습니까?')) {
+                localStorage.removeItem('animals');
+                localStorage.removeItem('lastSync');
+                localStorage.removeItem('lastSyncData');
+                
+                updateDataPanel();
+                showNotification('데이터가 초기화되었습니다');
+            }
+        }
+
+        // 디바이스 모드 설정
+        function setDeviceMode(mode) {
+            currentDeviceMode = mode;
+            
+            // 버튼 활성화 상태 변경
+            document.querySelectorAll('.device-option').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // 모바일 프레임 크기 조정
+            const mobileFrame = document.querySelector('.mobile-frame');
+            switch(mode) {
+                case 'mobile':
+                    mobileFrame.style.width = '375px';
+                    break;
+                case 'tablet':
+                    mobileFrame.style.width = '768px';
+                    break;
+                case 'desktop':
+                    mobileFrame.style.width = '1024px';
+                    break;
+            }
+            
+            showNotification(`${mode} 모드로 변경되었습니다`);
+        }
+
+        // 알림 표시
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = `
+                <i class="fas fa-info-circle"></i>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // 키보드 단축키
+        document.addEventListener('keydown', function(e) {
+            switch(e.key) {
+                case '1':
+                    refreshMobile();
+                    break;
+                case '2':
+                    refreshWeb();
+                    break;
+                case '3':
+                    addTestData();
+                    break;
+                case '4':
+                    clearData();
+                    break;
+                case 'm':
+                    setDeviceMode('mobile');
+                    break;
+                case 't':
+                    setDeviceMode('tablet');
+                    break;
+                case 'd':
+                    setDeviceMode('desktop');
+                    break;
+            }
+        });
+
+        // 페이지 언로드 시 정리
+        window.addEventListener('beforeunload', function() {
+            if (syncInterval) {
+                clearInterval(syncInterval);
+            }
+        });
+    </script>
+</body>
+</html> 

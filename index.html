@@ -136,12 +136,25 @@
             const loadingSubtext = document.querySelector('.loading-subtext');
             
             if (device.type === 'MOBILE' || device.type === 'TABLET') {
-                loadingText.textContent = '모바일 앱으로 이동 중...';
-                loadingSubtext.textContent = '터치 최적화된 인터페이스를 로드합니다';
+                // URL 파라미터 확인
+                const urlParams = new URLSearchParams(window.location.search);
+                const testMode = urlParams.get('test');
                 
-                setTimeout(() => {
-                    window.location.href = 'mobile-app.html';
-                }, 2000);
+                if (testMode === 'true') {
+                    loadingText.textContent = '모바일 테스트 모드로 이동 중...';
+                    loadingSubtext.textContent = '개발자 테스트 인터페이스를 로드합니다';
+                    
+                    setTimeout(() => {
+                        window.location.href = 'mobile-test.html';
+                    }, 2000);
+                } else {
+                    loadingText.textContent = '모바일 앱으로 이동 중...';
+                    loadingSubtext.textContent = '터치 최적화된 인터페이스를 로드합니다';
+                    
+                    setTimeout(() => {
+                        window.location.href = 'mobile-app.html';
+                    }, 2000);
+                }
             } else {
                 loadingText.textContent = '데스크톱 버전으로 이동 중...';
                 loadingSubtext.textContent = '전체 기능을 사용할 수 있습니다';
