@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 계정 초기화</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .admin-info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        button {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #1976d2;
+        }
+        
+        .danger {
+            background: #f44336;
+        }
+        
+        .danger:hover {
+            background: #d32f2f;
+        }
+        
+        .success {
+            background: #4caf50;
+        }
+        
+        .success:hover {
+            background: #388e3c;
+        }
+        
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🦎 관리자 계정 초기화</h1>
+        
+        <div class="info">
+            <h3>현재 상황</h3>
+            <p>기존 관리자 계정이 제거되고 새로운 관리자 계정이 생성되었습니다.</p>
+            
+            <div class="admin-info">
+                <strong>새로운 관리자 계정:</strong><br>
+                이메일: <code>admin@crestedgecko.com</code><br>
+                비밀번호: <code>Admin2024!</code><br>
+                이름: 시스템 관리자
+            </div>
+        </div>
+        
+        <div id="status"></div>
+        
+        <button onclick="resetLocalStorage()" class="danger">로컬 스토리지 초기화</button>
+        <button onclick="createNewAdmin()" class="success">새 관리자 계정 생성</button>
+        <button onclick="goToLogin()">로그인 페이지로 이동</button>
+        
+        <div class="info">
+            <h3>문제 해결 방법</h3>
+            <ol>
+                <li>위의 "로컬 스토리지 초기화" 버튼을 클릭하세요</li>
+                <li>"새 관리자 계정 생성" 버튼을 클릭하세요</li>
+                <li>"로그인 페이지로 이동" 버튼을 클릭하세요</li>
+                <li>새로운 관리자 계정으로 로그인하세요</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function showStatus(message, type = 'success') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+        
+        function resetLocalStorage() {
+            try {
+                // 기존 사용자 데이터 삭제
+                localStorage.removeItem('users');
+                localStorage.removeItem('currentUser');
+                
+                // 기타 관련 데이터도 삭제
+                localStorage.removeItem('animals');
+                localStorage.removeItem('settings');
+                
+                showStatus('✅ 로컬 스토리지가 성공적으로 초기화되었습니다.', 'success');
+            } catch (error) {
+                showStatus('❌ 초기화 중 오류가 발생했습니다: ' + error.message, 'error');
+            }
+        }
+        
+        function createNewAdmin() {
+            try {
+                const newAdmin = {
+                    'admin@crestedgecko.com': {
+                        email: 'admin@crestedgecko.com',
+                        password: 'Admin2024!',
+                        name: '시스템 관리자',
+                        plan: 'admin',
+                        role: 'admin',
+                        createdAt: new Date().toISOString()
+                    }
+                };
+                
+                localStorage.setItem('users', JSON.stringify(newAdmin));
+                showStatus('✅ 새로운 관리자 계정이 생성되었습니다.', 'success');
+            } catch (error) {
+                showStatus('❌ 계정 생성 중 오류가 발생했습니다: ' + error.message, 'error');
+            }
+        }
+        
+        function goToLogin() {
+            window.location.href = 'login.html';
+        }
+        
+        // 페이지 로드 시 현재 상태 확인
+        window.onload = function() {
+            const users = localStorage.getItem('users');
+            const currentUser = localStorage.getItem('currentUser');
+            
+            let status = '현재 상태: ';
+            if (users) {
+                status += '사용자 데이터 존재, ';
+            } else {
+                status += '사용자 데이터 없음, ';
+            }
+            
+            if (currentUser) {
+                status += '로그인된 사용자 있음';
+            } else {
+                status += '로그인된 사용자 없음';
+            }
+            
+            showStatus(status, 'success');
+        };
+    </script>
+</body>
+</html> 

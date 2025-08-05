@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>데이터 복구 도구</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .danger {
+            background: #dc3545;
+        }
+        .danger:hover {
+            background: #c82333;
+        }
+        .success {
+            background: #28a745;
+        }
+        .success:hover {
+            background: #218838;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .data-item {
+            background: #e9ecef;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 데이터 복구 도구</h1>
+        <p>이전에 등록했던 개체 데이터를 복구하고 관리할 수 있습니다.</p>
+
+        <div class="section">
+            <h3>📊 현재 로컬 스토리지 상태</h3>
+            <button onclick="checkAllStorage()">전체 스토리지 확인</button>
+            <button onclick="checkAnimalData()">개체 데이터만 확인</button>
+            <button onclick="checkUserData()">사용자 데이터만 확인</button>
+            <div id="storageInfo"></div>
+        </div>
+
+        <div class="section">
+            <h3>🔄 데이터 복구 옵션</h3>
+            <button onclick="restoreSampleData()" class="success">샘플 데이터 복구</button>
+            <button onclick="restoreBackupData()" class="success">백업 데이터 복구</button>
+            <button onclick="createBackup()" class="success">현재 데이터 백업</button>
+        </div>
+
+        <div class="section">
+            <h3>🗑️ 데이터 관리</h3>
+            <button onclick="clearAllData()" class="danger">모든 데이터 삭제</button>
+            <button onclick="clearAnimalData()" class="danger">개체 데이터만 삭제</button>
+            <button onclick="clearUserData()" class="danger">사용자 데이터만 삭제</button>
+        </div>
+
+        <div class="section">
+            <h3>📋 복구된 데이터 미리보기</h3>
+            <div id="dataPreview"></div>
+        </div>
+
+        <div class="section">
+            <h3>🏠 메인 페이지로 이동</h3>
+            <button onclick="goToMain()">메인 페이지로 이동</button>
+        </div>
+    </div>
+
+    <script>
+        // 샘플 개체 데이터
+        const sampleAnimals = [
+            {
+                id: "gecko_001",
+                name: "레오파드 게코 #1",
+                category: "레오파드 게코",
+                gender: "수컷",
+                morph: "노멀",
+                generation: "f1",
+                birthDate: "2023-01-15",
+                weight: 45,
+                length: 18,
+                status: "active",
+                images: [],
+                notes: "첫 번째 등록 개체",
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: "gecko_002", 
+                name: "레오파드 게코 #2",
+                category: "레오파드 게코",
+                gender: "암컷",
+                morph: "노멀",
+                generation: "f1",
+                birthDate: "2023-02-20",
+                weight: 42,
+                length: 17,
+                status: "active",
+                images: [],
+                notes: "번식용 암컷",
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: "gecko_003",
+                name: "레오파드 게코 #3", 
+                category: "레오파드 게코",
+                gender: "수컷",
+                morph: "노멀",
+                generation: "f1",
+                birthDate: "2023-03-10",
+                weight: 48,
+                length: 19,
+                status: "active",
+                images: [],
+                notes: "고품질 번식용",
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: "gecko_004",
+                name: "레오파드 게코 #4",
+                category: "레오파드 게코", 
+                gender: "암컷",
+                morph: "노멀",
+                generation: "f1",
+                birthDate: "2023-04-05",
+                weight: 40,
+                length: 16,
+                status: "active",
+                images: [],
+                notes: "새로 추가된 암컷",
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: "gecko_005",
+                name: "레오파드 게코 #5",
+                category: "레오파드 게코",
+                gender: "수컷", 
+                morph: "노멀",
+                generation: "f1",
+                birthDate: "2023-05-12",
+                weight: 46,
+                length: 18.5,
+                status: "active",
+                images: [],
+                notes: "최고 품질 개체",
+                createdAt: new Date().toISOString()
+            }
+        ];
+
+        // 샘플 사용자 데이터
+        const sampleUsers = {
+            'admin@crestedgecko.com': {
+                email: 'admin@crestedgecko.com',
+                password: 'Admin2024!',
+                name: '시스템 관리자',
+                plan: 'admin',
+                role: 'admin',
+                createdAt: new Date().toISOString()
+            },
+            'tester@example.com': {
+                email: 'tester@example.com',
+                password: 'test123',
+                name: '테스터',
+                plan: 'lifetime',
+                role: 'user',
+                createdAt: new Date().toISOString()
+            }
+        };
+
+        function checkAllStorage() {
+            const storageInfo = document.getElementById('storageInfo');
+            let html = '<h4>📋 전체 로컬 스토리지 데이터:</h4>';
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                html += `<div class="data-item">
+                    <strong>키:</strong> ${key}<br>
+                    <strong>값:</strong> <pre>${value}</pre>
+                </div>`;
+            }
+            
+            storageInfo.innerHTML = html;
+        }
+
+        function checkAnimalData() {
+            const storageInfo = document.getElementById('storageInfo');
+            const animalData = localStorage.getItem('gecko-breeding-data');
+            
+            if (animalData) {
+                const animals = JSON.parse(animalData);
+                html = '<h4>🐛 개체 데이터:</h4>';
+                html += `<p>총 ${animals.length}마리 등록됨</p>`;
+                html += `<pre>${JSON.stringify(animals, null, 2)}</pre>`;
+            } else {
+                html = '<h4>🐛 개체 데이터:</h4><p>등록된 개체가 없습니다.</p>';
+            }
+            
+            storageInfo.innerHTML = html;
+        }
+
+        function checkUserData() {
+            const storageInfo = document.getElementById('storageInfo');
+            const userData = localStorage.getItem('users');
+            
+            if (userData) {
+                const users = JSON.parse(userData);
+                html = '<h4>👥 사용자 데이터:</h4>';
+                html += `<p>총 ${Object.keys(users).length}명 등록됨</p>`;
+                html += `<pre>${JSON.stringify(users, null, 2)}</pre>`;
+            } else {
+                html = '<h4>👥 사용자 데이터:</h4><p>등록된 사용자가 없습니다.</p>';
+            }
+            
+            storageInfo.innerHTML = html;
+        }
+
+        function restoreSampleData() {
+            // 개체 데이터 복구
+            localStorage.setItem('gecko-breeding-data', JSON.stringify(sampleAnimals));
+            
+            // 사용자 데이터 복구
+            localStorage.setItem('users', JSON.stringify(sampleUsers));
+            
+            // 현재 사용자 세션 설정
+            localStorage.setItem('currentUser', 'admin@crestedgecko.com');
+            
+            alert('✅ 샘플 데이터가 성공적으로 복구되었습니다!\n\n' +
+                  '📊 개체: 5마리\n' +
+                  '👥 사용자: 2명\n' +
+                  '🔑 관리자 계정: admin@crestedgecko.com / Admin2024!');
+            
+            updateDataPreview();
+        }
+
+        function restoreBackupData() {
+            const backup = localStorage.getItem('gecko-backup-data');
+            if (backup) {
+                const backupData = JSON.parse(backup);
+                
+                if (backupData.animals) {
+                    localStorage.setItem('gecko-breeding-data', JSON.stringify(backupData.animals));
+                }
+                if (backupData.users) {
+                    localStorage.setItem('users', JSON.stringify(backupData.users));
+                }
+                
+                alert('✅ 백업 데이터가 성공적으로 복구되었습니다!');
+                updateDataPreview();
+            } else {
+                alert('❌ 백업 데이터가 없습니다. 먼저 데이터를 백업해주세요.');
+            }
+        }
+
+        function createBackup() {
+            const animals = localStorage.getItem('gecko-breeding-data');
+            const users = localStorage.getItem('users');
+            
+            const backupData = {
+                animals: animals ? JSON.parse(animals) : [],
+                users: users ? JSON.parse(users) : {},
+                backupDate: new Date().toISOString()
+            };
+            
+            localStorage.setItem('gecko-backup-data', JSON.stringify(backupData));
+            
+            alert('✅ 현재 데이터가 백업되었습니다!');
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ 모든 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+                localStorage.clear();
+                alert('🗑️ 모든 데이터가 삭제되었습니다.');
+                updateDataPreview();
+            }
+        }
+
+        function clearAnimalData() {
+            if (confirm('⚠️ 개체 데이터만 삭제하시겠습니까?')) {
+                localStorage.removeItem('gecko-breeding-data');
+                alert('🗑️ 개체 데이터가 삭제되었습니다.');
+                updateDataPreview();
+            }
+        }
+
+        function clearUserData() {
+            if (confirm('⚠️ 사용자 데이터만 삭제하시겠습니까?')) {
+                localStorage.removeItem('users');
+                localStorage.removeItem('currentUser');
+                alert('🗑️ 사용자 데이터가 삭제되었습니다.');
+                updateDataPreview();
+            }
+        }
+
+        function updateDataPreview() {
+            const preview = document.getElementById('dataPreview');
+            const animals = localStorage.getItem('gecko-breeding-data');
+            const users = localStorage.getItem('users');
+            
+            let html = '<h4>📊 현재 데이터 상태:</h4>';
+            
+            if (animals) {
+                const animalCount = JSON.parse(animals).length;
+                html += `<p>🐛 개체: ${animalCount}마리</p>`;
+            } else {
+                html += '<p>🐛 개체: 없음</p>';
+            }
+            
+            if (users) {
+                const userCount = Object.keys(JSON.parse(users)).length;
+                html += `<p>👥 사용자: ${userCount}명</p>`;
+            } else {
+                html += '<p>👥 사용자: 없음</p>';
+            }
+            
+            preview.innerHTML = html;
+        }
+
+        function goToMain() {
+            window.location.href = 'index.html';
+        }
+
+        // 페이지 로드 시 데이터 미리보기 업데이트
+        updateDataPreview();
+    </script>
+</body>
+</html> 

@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>개체 등록 디버그</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .debug-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #007bff;
+        }
+        
+        .debug-section h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        
+        .form-group {
+            margin: 15px 0;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background: #0056b3;
+        }
+        
+        .success {
+            background: #28a745;
+        }
+        
+        .success:hover {
+            background: #1e7e34;
+        }
+        
+        .danger {
+            background: #dc3545;
+        }
+        
+        .danger:hover {
+            background: #c82333;
+        }
+        
+        .warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .warning:hover {
+            background: #e0a800;
+        }
+        
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .result.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .test-form {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .morph-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .morph-checkbox {
+            display: inline-block;
+            margin: 5px 10px 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 개체 등록 디버그 도구</h1>
+        
+        <div class="debug-section">
+            <h3>1. 현재 상태 확인</h3>
+            <button onclick="checkCurrentStatus()">상태 확인</button>
+            <button onclick="clearAllData()" class="danger">모든 데이터 삭제</button>
+            <div id="statusResult"></div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>2. 사용자 확인</h3>
+            <button onclick="checkUser()">사용자 확인</button>
+            <button onclick="createTestUser()" class="success">테스트 사용자 생성</button>
+            <div id="userResult"></div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>3. 개체 등록 테스트</h3>
+            <div class="test-form">
+                <div class="form-group">
+                    <label for="testName">개체 이름:</label>
+                    <input type="text" id="testName" value="테스트 게코">
+                </div>
+                
+                <div class="form-group">
+                    <label for="testCategory">카테고리:</label>
+                    <select id="testCategory">
+                        <option value="breeding">번식용</option>
+                        <option value="pet">반려용</option>
+                        <option value="show">전시용</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="testGeneration">세대:</label>
+                    <select id="testGeneration">
+                        <option value="F1">F1</option>
+                        <option value="F2">F2</option>
+                        <option value="F3">F3</option>
+                        <option value="F4">F4</option>
+                        <option value="F5">F5</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="testGender">성별:</label>
+                    <select id="testGender">
+                        <option value="male">수컷</option>
+                        <option value="female">암컷</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="testStatus">상태:</label>
+                    <select id="testStatus">
+                        <option value="active">활성</option>
+                        <option value="inactive">비활성</option>
+                        <option value="sold">판매됨</option>
+                    </select>
+                </div>
+                
+                <div class="morph-section">
+                    <label>모프 선택:</label><br>
+                    <label class="morph-checkbox">
+                        <input type="checkbox" name="testMorph" value="normal"> 노멀
+                    </label>
+                    <label class="morph-checkbox">
+                        <input type="checkbox" name="testMorph" value="lily-white"> 릴리화이트
+                    </label>
+                    <label class="morph-checkbox">
+                        <input type="checkbox" name="testMorph" value="sable"> 세이블
+                    </label>
+                    <label class="morph-checkbox">
+                        <input type="checkbox" name="testMorph" value="axanthic"> 액산틱
+                    </label>
+                </div>
+                
+                <button onclick="testRegister()" class="success">개체 등록 테스트</button>
+                <button onclick="testRegisterWithImage()" class="warning">이미지 포함 등록 테스트</button>
+            </div>
+            <div id="registerResult"></div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>4. 저장된 데이터 확인</h3>
+            <button onclick="showStoredData()">저장된 데이터 보기</button>
+            <button onclick="exportData()" class="warning">데이터 내보내기</button>
+            <div id="dataResult"></div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>5. 문제 해결</h3>
+            <button onclick="fixCommonIssues()" class="success">일반적인 문제 해결</button>
+            <button onclick="resetRegistration()" class="danger">등록 시스템 초기화</button>
+            <div id="fixResult"></div>
+        </div>
+    </div>
+
+    <script>
+        // 전역 변수들
+        const LOCAL_STORAGE_KEY = 'animals';
+        let paymentSystem = {
+            plans: {
+                free: { name: 'Free', limits: { animals: 5, generations: ['f1'], imagesPerAnimal: 1 } },
+                pro: { name: 'Pro', limits: { animals: 50, generations: ['f1', 'f2', 'f3'], imagesPerAnimal: 5 } },
+                lifetime: { name: 'Lifetime Pro', limits: { animals: -1, generations: ['f1', 'f2', 'f3', 'f4', 'f5'], imagesPerAnimal: -1 } },
+                admin: { name: 'Admin', limits: { animals: -1, generations: ['f1', 'f2', 'f3', 'f4', 'f5'], imagesPerAnimal: -1 } }
+            }
+        };
+
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="result ${type}">${message}</div>`;
+        }
+        
+        function checkCurrentStatus() {
+            try {
+                const animals = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '{}');
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                const users = JSON.parse(localStorage.getItem('users') || '{}');
+                
+                let status = '<strong>현재 상태:</strong><br>';
+                status += `저장된 개체 데이터: ${Object.keys(animals).length} 세대<br>`;
+                status += `총 개체 수: ${Object.values(animals).flat().length}개<br>`;
+                status += `현재 사용자: ${currentUser.email || '없음'}<br>`;
+                status += `사용자 플랜: ${currentUser.plan || '없음'}<br>`;
+                status += `등록된 사용자: ${Object.keys(users).length}명<br>`;
+                
+                if (Object.keys(animals).length > 0) {
+                    status += '<br><strong>세대별 개체 수:</strong><br>';
+                    Object.entries(animals).forEach(([gen, animals]) => {
+                        status += `${gen.toUpperCase()}: ${animals.length}개<br>`;
+                    });
+                }
+                
+                showResult('statusResult', status, 'info');
+            } catch (error) {
+                showResult('statusResult', `오류 발생: ${error.message}`, 'error');
+            }
+        }
+        
+        function clearAllData() {
+            try {
+                localStorage.removeItem(LOCAL_STORAGE_KEY);
+                showResult('statusResult', '✅ 모든 개체 데이터가 삭제되었습니다.', 'success');
+            } catch (error) {
+                showResult('statusResult', `❌ 데이터 삭제 중 오류: ${error.message}`, 'error');
+            }
+        }
+        
+        function checkUser() {
+            try {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                const users = JSON.parse(localStorage.getItem('users') || '{}');
+                
+                if (currentUser.email) {
+                    const userInfo = users[currentUser.email];
+                    let status = '<strong>현재 사용자:</strong><br>';
+                    status += `이메일: ${currentUser.email}<br>`;
+                    status += `이름: ${currentUser.name}<br>`;
+                    status += `플랜: ${currentUser.plan}<br>`;
+                    status += `가입일: ${new Date(currentUser.createdAt).toLocaleDateString()}<br>`;
+                    
+                    if (userInfo) {
+                        const plan = paymentSystem.plans[userInfo.plan || 'free'];
+                        status += `<br><strong>플랜 제한:</strong><br>`;
+                        status += `최대 개체 수: ${plan.limits.animals === -1 ? '무제한' : plan.limits.animals}개<br>`;
+                        status += `허용 세대: ${plan.limits.generations.join(', ')}<br>`;
+                        status += `개체당 이미지: ${plan.limits.imagesPerAnimal === -1 ? '무제한' : plan.limits.imagesPerAnimal}장<br>`;
+                    }
+                    
+                    showResult('userResult', status, 'success');
+                } else {
+                    showResult('userResult', '❌ 로그인된 사용자가 없습니다.', 'error');
+                }
+            } catch (error) {
+                showResult('userResult', `❌ 사용자 확인 중 오류: ${error.message}`, 'error');
+            }
+        }
+        
+        function createTestUser() {
+            try {
+                const testUser = {
+                    email: 'test@example.com',
+                    name: '테스트 사용자',
+                    plan: 'admin',
+                    role: 'admin',
+                    createdAt: new Date().toISOString()
+                };
+                
+                localStorage.setItem('currentUser', JSON.stringify(testUser));
+                
+                const users = JSON.parse(localStorage.getItem('users') || '{}');
+                users[testUser.email] = testUser;
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                showResult('userResult', '✅ 테스트 사용자가 생성되었습니다. (관리자 권한)', 'success');
+            } catch (error) {
+                showResult('userResult', `❌ 테스트 사용자 생성 중 오류: ${error.message}`, 'error');
+            }
+        }
+        
+        function testRegister() {
+            try {
+                const name = document.getElementById('testName').value;
+                const category = document.getElementById('testCategory').value;
+                const generation = document.getElementById('testGeneration').value;
+                const gender = document.getElementById('testGender').value;
+                const status = document.getElementById('testStatus').value;
+                
+                // 선택된 모프들 수집
+                const selectedMorphs = [];
+                const checkboxes = document.querySelectorAll('input[name="testMorph"]:checked');
+                checkboxes.forEach(checkbox => {
+                    selectedMorphs.push(checkbox.value);
+                });
+                
+                // 사용자 확인
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                if (!currentUser.email) {
+                    showResult('registerResult', '❌ 먼저 로그인해주세요.', 'error');
+                    return;
+                }
+                
+                // 플랜 제한 확인
+                const animalCount = Object.values(JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '{}')).flat().length;
+                const plan = paymentSystem.plans[currentUser.plan || 'free'];
+                
+                if (plan && plan.limits.animals !== -1 && animalCount >= plan.limits.animals) {
+                    showResult('registerResult', `❌ ${plan.name} 플랜은 최대 ${plan.limits.animals}개체까지만 등록할 수 있습니다.`, 'error');
+                    return;
+                }
+                
+                // 세대 제한 확인
+                if (plan && plan.limits.generations && !plan.limits.generations.includes(generation.toLowerCase())) {
+                    const allowedGenerations = plan.limits.generations.map(g => g.toUpperCase()).join(', ');
+                    showResult('registerResult', `❌ ${plan.name} 플랜은 ${allowedGenerations} 세대까지만 등록할 수 있습니다.`, 'error');
+                    return;
+                }
+                
+                // 개체 데이터 생성
+                const animalData = {
+                    name,
+                    category,
+                    generation,
+                    gender,
+                    status,
+                    father: null,
+                    mother: null,
+                    morphs: selectedMorphs,
+                    fileInfo: null,
+                    imageData: null,
+                    imageStatus: "no-file",
+                    createdAt: new Date().toISOString()
+                };
+                
+                // 저장
+                saveAnimalToStorage(animalData);
+                
+                showResult('registerResult', `✅ 개체 등록 성공! ${generation} 세대 ${name}이(가) 등록되었습니다.`, 'success');
+                
+            } catch (error) {
+                showResult('registerResult', `❌ 등록 중 오류: ${error.message}`, 'error');
+            }
+        }
+        
+        function testRegisterWithImage() {
+            showResult('registerResult', '이미지 등록 테스트는 실제 파일이 필요합니다. 메인 페이지에서 테스트해주세요.', 'info');
+        }
+        
+        function saveAnimalToStorage(animalData) {
+            try {
+                const data = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '{}');
+                const generationKey = animalData.generation.toLowerCase();
+                
+                if (!data[generationKey]) {
+                    data[generationKey] = [];
+                }
+                
+                data[generationKey].push({
+                    id: Date.now().toString(),
+                    ...animalData
+                });
+                
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+            } catch (err) {
+                if (err.name === 'QuotaExceededError') {
+                    throw new Error('저장 공간이 부족합니다.');
+                }
+                throw err;
+            }
+        }
+        
+        function showStoredData() {
+            try {
+                const animals = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '{}');
+                
+                if (Object.keys(animals).length === 0) {
+                    showResult('dataResult', '저장된 개체 데이터가 없습니다.', 'info');
+                    return;
+                }
+                
+                let dataInfo = '<strong>저장된 개체 데이터:</strong><br>';
+                Object.entries(animals).forEach(([gen, animals]) => {
+                    dataInfo += `<br><strong>${gen.toUpperCase()} 세대 (${animals.length}개):</strong><br>`;
+                    animals.forEach((animal, index) => {
+                        dataInfo += `${index + 1}. ${animal.name} (${animal.gender}, ${animal.status})<br>`;
+                    });
+                });
+                
+                showResult('dataResult', dataInfo, 'info');
+            } catch (error) {
+                showResult('dataResult', `❌ 데이터 확인 중 오류: ${error.message}`, 'error');
+            }
+        }
+        
+        function exportData() {
+            try {
+                const animals = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '{}');
+                const dataStr = JSON.stringify(animals, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `animals-backup-${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+                
+                showResult('dataResult', '✅ 데이터가 다운로드되었습니다.', 'success');
+            } catch (error) {
+                showResult('dataResult', `❌ 데이터 내보내기 중 오류: ${error.message}`, 'error');
+            }
+        }
+        
+        function fixCommonIssues() {
+            try {
+                // 1. 사용자 생성
+                if (!localStorage.getItem('currentUser')) {
+                    createTestUser();
+                }
+                
+                // 2. 로컬 스토리지 키 확인
+                if (!localStorage.getItem(LOCAL_STORAGE_KEY)) {
+                    localStorage.setItem(LOCAL_STORAGE_KEY, '{}');
+                }
+                
+                // 3. 기본 데이터 구조 확인
+                const animals = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '{}');
+                if (typeof animals !== 'object') {
+                    localStorage.setItem(LOCAL_STORAGE_KEY, '{}');
+                }
+                
+                showResult('fixResult', '✅ 일반적인 문제들이 해결되었습니다.', 'success');
+            } catch (error) {
+                showResult('fixResult', `❌ 문제 해결 중 오류: ${error.message}`, 'error');
+            }
+        }
+        
+        function resetRegistration() {
+            try {
+                localStorage.removeItem(LOCAL_STORAGE_KEY);
+                localStorage.removeItem('currentUser');
+                showResult('fixResult', '✅ 등록 시스템이 초기화되었습니다.', 'success');
+            } catch (error) {
+                showResult('fixResult', `❌ 초기화 중 오류: ${error.message}`, 'error');
+            }
+        }
+        
+        // 페이지 로드 시 자동으로 상태 확인
+        window.onload = function() {
+            checkCurrentStatus();
+        };
+    </script>
+</body>
+</html> 

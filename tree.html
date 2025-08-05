@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>가족 관계도 - 크레스티드 게코 브리딩 관리</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #4a5568;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-section {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 15px;
+            align-items: end;
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .tree-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            min-height: 500px;
+        }
+
+        .tree-content {
+            text-align: center;
+            color: #718096;
+        }
+
+        .tree-node {
+            display: inline-block;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 10px;
+            text-align: center;
+            min-width: 150px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .tree-node:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .tree-node.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+        }
+
+        .tree-node img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .tree-node-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            color: #4a5568;
+        }
+
+        .tree-node-info {
+            font-size: 0.8rem;
+            color: #718096;
+            background: #f8fafc;
+            padding: 3px 8px;
+            border-radius: 10px;
+            display: inline-block;
+            margin: 2px;
+        }
+
+        .tree-connection {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .tree-arrow {
+            font-size: 2rem;
+            color: #667eea;
+            margin: 0 15px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .tree-generation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .tree-generation-label {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .no-animals {
+            text-align: center;
+            padding: 60px 20px;
+            color: #718096;
+            font-size: 1.2rem;
+        }
+
+        .no-animals i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .search-results {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: white;
+        }
+
+        .search-result-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .search-result-item:hover {
+            background: #f8fafc;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-item img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 12px;
+        }
+
+        .search-result-info {
+            flex: 1;
+        }
+
+        .search-result-name {
+            font-weight: bold;
+            margin-bottom: 2px;
+            color: #4a5568;
+        }
+
+        .search-result-details {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        /* 마인드맵 스타일 */
+        .mindmap-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .mindmap-title {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4a5568;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .mindmap-tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+        }
+
+        .mindmap-parents {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .mindmap-current {
+            margin: 20px 0;
+        }
+
+        .mindmap-offspring {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .mindmap-node {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            min-width: 150px;
+            text-align: center;
+            position: relative;
+        }
+
+        .mindmap-node:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .mindmap-node.selected {
+            border: 3px solid #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .node-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 auto 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .node-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .node-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+
+        .node-details {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .node-generation, .node-gender {
+            font-size: 0.8rem;
+            color: #718096;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: #f7fafc;
+        }
+
+        .node-role {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 15px;
+            margin-top: 5px;
+        }
+
+        .father-role {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .mother-role {
+            background: #fce4ec;
+            color: #c2185b;
+        }
+
+        .current-role {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .offspring-role {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .empty-role {
+            background: #f8f9fa;
+            color: #6c757d;
+        }
+
+        .connection-line {
+            width: 3px;
+            height: 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 2px;
+            margin: 10px auto;
+            position: relative;
+        }
+
+        .connection-line::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 5px solid #667eea;
+        }
+
+        .mindmap-info {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .info-text {
+            color: #718096;
+            font-style: italic;
+            margin-bottom: 15px;
+        }
+
+        /* 깔끔한 가족 관계도 스타일 */
+        .family-tree-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .family-tree-title {
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .family-tree {
+            display: flex;
+            flex-direction: column;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .generation {
+            width: 100%;
+            text-align: center;
+        }
+
+        .generation-label {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #f8f9fa;
+            background: rgba(255,255,255,0.15);
+            padding: 12px 25px;
+            border-radius: 25px;
+            display: inline-block;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .grandparents-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 80px;
+            margin-bottom: 30px;
+        }
+
+        .paternal-side, .maternal-side {
+            display: flex;
+            gap: 40px;
+        }
+
+        .grandparent-node, .parent-node, .child-node {
+            background: rgba(255,255,255,0.12);
+            border: 2px solid rgba(255,255,255,0.25);
+            border-radius: 20px;
+            padding: 20px;
+            width: 140px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(15px);
+            position: relative;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .grandparent-node:hover, .parent-node:hover, .child-node:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            border-color: rgba(255,255,255,0.4);
+        }
+
+        .grandparent-node::before, .parent-node::before, .child-node::before {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid rgba(255,255,255,0.25);
+        }
+
+        .parents-row {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+        }
+
+        .current-node {
+            background: rgba(255,255,255,0.18);
+            border: 3px solid #10b981;
+            border-radius: 25px;
+            padding: 30px;
+            width: 180px;
+            text-align: center;
+            margin: 0 auto;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .current-node:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+        }
+
+        .current-node::before {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-bottom: 12px solid #10b981;
+        }
+
+        .children-row {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            flex-wrap: wrap;
+        }
+
+        .child-node.empty {
+            border: 2px dashed rgba(255,255,255,0.4);
+            background: rgba(255,255,255,0.08);
+        }
+
+        .node-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.15);
+            border: 3px solid rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .node-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .node-image i {
+            font-size: 2.8rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .node-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .node-role {
+            font-size: 0.85rem;
+            padding: 6px 12px;
+            border-radius: 15px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .grandfather-role {
+            background: rgba(255, 193, 7, 0.3);
+            border-color: rgba(255, 193, 7, 0.5);
+        }
+
+        .grandmother-role {
+            background: rgba(255, 105, 180, 0.3);
+            border-color: rgba(255, 105, 180, 0.5);
+        }
+
+        .father-role {
+            background: rgba(59, 130, 246, 0.3);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        .mother-role {
+            background: rgba(239, 68, 68, 0.3);
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+
+        .current-role {
+            background: rgba(16, 185, 129, 0.3);
+            border-color: rgba(16, 185, 129, 0.5);
+        }
+
+        .child-role {
+            background: rgba(245, 158, 11, 0.3);
+            border-color: rgba(245, 158, 11, 0.5);
+        }
+
+        .empty-role {
+            background: rgba(107, 114, 128, 0.3);
+            border-color: rgba(107, 114, 128, 0.5);
+        }
+
+        .connection-lines {
+            position: relative;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .connection-line {
+            width: 2px;
+            height: 50px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.3));
+            position: relative;
+            border-radius: 1px;
+        }
+
+        .connection-line::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 8px solid rgba(255,255,255,0.8);
+        }
+
+        .family-tree-info {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .info-text {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            color: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.1);
+            padding: 15px 25px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .register-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669) !important;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #059669, #047857) !important;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+        }
+
+        /* 상세 정보 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 25px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            background: rgba(255,255,255,0.1);
+            padding: 25px 30px;
+            border-radius: 25px 25px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-title {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .close {
+            color: rgba(255,255,255,0.8);
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .close:hover {
+            color: white;
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.1);
+        }
+
+        .modal-body {
+            padding: 30px;
+            color: white;
+        }
+
+        .detail-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .detail-label {
+            font-weight: 600;
+            min-width: 100px;
+            margin-right: 20px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .detail-value {
+            flex: 1;
+            color: white;
+        }
+
+        .detail-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 15px;
+            object-fit: cover;
+            margin: 20px auto;
+            display: block;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .detail-notes {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .detail-notes h4 {
+            margin-bottom: 10px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .detail-notes p {
+            color: white;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .search-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .tree-generation {
+                flex-direction: column;
+            }
+            
+            .mindmap-parents {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .mindmap-offspring {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .mindmap-node {
+                min-width: 120px;
+            }
+
+            /* 전통적인 가족 관계도 반응형 */
+            .family-tree-container {
+                padding: 10px;
+            }
+
+            .family-tree-title {
+                font-size: 2rem;
+            }
+
+            .grandparents-row {
+                flex-direction: column;
+                gap: 30px;
+            }
+
+            .paternal-side, .maternal-side {
+                justify-content: center;
+                gap: 20px;
+            }
+
+            .parents-row {
+                flex-direction: column;
+                gap: 30px;
+            }
+
+            .children-row {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+
+            .grandparent-node, .parent-node, .child-node {
+                width: 110px;
+                padding: 12px;
+            }
+
+            .current-node {
+                width: 160px;
+                padding: 20px;
+            }
+
+            .node-image {
+                width: 60px;
+                height: 60px;
+            }
+
+            .node-name {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> 메인으로 돌아가기
+        </a>
+
+        <div class="header">
+            <h1>🦎 가족 관계도</h1>
+            <p>개체들의 혈통과 가족 관계를 시각적으로 확인하세요</p>
+        </div>
+
+        <div class="controls">
+            <div class="search-section">
+                <input type="text" id="searchInput" class="form-control" placeholder="개체 이름으로 검색..." onkeyup="searchAnimals()">
+                <button onclick="showSearchResults()" class="btn">
+                    <i class="fas fa-search"></i> 검색
+                </button>
+            </div>
+
+            <div id="searchResults" class="search-results" style="display: none;"></div>
+        </div>
+
+        <div class="tree-container">
+            <div id="treeContent" class="tree-content">
+                <div class="no-animals">
+                    <i class="fas fa-tree"></i>
+                    <p>등록된 개체가 없습니다.</p>
+                    <a href="register.html" class="btn" style="margin-top: 20px;">
+                        <i class="fas fa-plus"></i> 첫 번째 개체 등록하기
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 상세 정보 모달 -->
+    <div id="animalDetailModal" class="modal">
+        <div id="modalContent" class="modal-content">
+            <!-- 모달 내용은 JavaScript로 동적 생성 -->
+        </div>
+    </div>
+
+    <script>
+        // 개인 사용자 설정
+        const user = {
+            name: '개인 사용자',
+            createdAt: new Date().toISOString()
+        };
+
+        // 로컬 스토리지에 사용자 정보 저장
+        localStorage.setItem('currentUser', JSON.stringify(user));
+
+        let allAnimals = [];
+        let selectedAnimal = null;
+
+        function loadAnimals() {
+            allAnimals = JSON.parse(localStorage.getItem('animals') || '[]');
+            if (allAnimals.length === 0) {
+                showNoAnimals();
+            } else {
+                showAnimalSelection();
+            }
+        }
+
+        function showNoAnimals() {
+            document.getElementById('treeContent').innerHTML = `
+                <div class="no-animals">
+                    <i class="fas fa-tree"></i>
+                    <p>등록된 개체가 없습니다.</p>
+                    <a href="register.html" class="btn" style="margin-top: 20px;">
+                        <i class="fas fa-plus"></i> 첫 번째 개체 등록하기
+                    </a>
+                </div>
+            `;
+        }
+
+        function showAnimalSelection() {
+            document.getElementById('treeContent').innerHTML = `
+                <div class="tree-generation">
+                    <div class="tree-generation-label">개체를 선택하여 가족 관계도를 확인하세요</div>
+                    ${allAnimals.map(animal => createAnimalNode(animal)).join('')}
+                </div>
+            `;
+        }
+
+        function createAnimalNode(animal) {
+            const statusClass = animal.status === 'sold' ? 'sold' : animal.status === 'deceased' ? 'deceased' : '';
+            const statusText = animal.status === 'active' ? '보유 중' : 
+                             animal.status === 'sold' ? '분양 완료' : '사망';
+
+            // 부모 정보 표시
+            let parentInfo = '';
+            if (animal.fatherId || animal.motherId) {
+                const father = allAnimals.find(a => a.id === animal.fatherId);
+                const mother = allAnimals.find(a => a.id === animal.motherId);
+                if (father || mother) {
+                    parentInfo = `<div class="tree-node-info" style="background: #e8f5e8; color: #2e7d32;">부모연결됨</div>`;
+                }
+            }
+
+            return `
+                <div class="tree-node" onclick="selectAnimal('${animal.id}')">
+                    <div class="animal-image">
+                        ${animal.image ? 
+                            `<img src="${animal.image}" alt="${animal.name}">` : 
+                            '<i class="fas fa-dragon" style="font-size: 2rem; color: #667eea;"></i>'
+                        }
+                    </div>
+                    <div class="tree-node-name">${animal.name}</div>
+                    <div class="tree-node-info">${animal.generation}</div>
+                    <div class="tree-node-info">${animal.gender}</div>
+                    <div class="tree-node-info ${statusClass}">${statusText}</div>
+                    ${parentInfo}
+                </div>
+            `;
+        }
+
+        function selectAnimal(id) {
+            selectedAnimal = allAnimals.find(a => a.id === id);
+            if (selectedAnimal) {
+                showFamilyTree(selectedAnimal);
+            }
+        }
+
+        function showFamilyTree(animal) {
+            // 부모 정보 찾기
+            const father = animal.fatherId ? allAnimals.find(a => a.id === animal.fatherId) : null;
+            const mother = animal.motherId ? allAnimals.find(a => a.id === animal.motherId) : null;
+            
+            // 조부모 정보 찾기
+            const paternalGrandfather = father && father.fatherId ? allAnimals.find(a => a.id === father.fatherId) : null;
+            const paternalGrandmother = father && father.motherId ? allAnimals.find(a => a.id === father.motherId) : null;
+            const maternalGrandfather = mother && mother.fatherId ? allAnimals.find(a => a.id === mother.fatherId) : null;
+            const maternalGrandmother = mother && mother.motherId ? allAnimals.find(a => a.id === mother.motherId) : null;
+            
+            // 자손 정보 찾기
+            const children = allAnimals.filter(a => 
+                (a.fatherId === animal.id || a.motherId === animal.id) && a.id !== animal.id
+            );
+
+            let treeHTML = `
+                <div class="family-tree-container">
+                    <div class="family-tree-title">${animal.name}의 가족 관계도</div>
+                    
+                    <div class="family-tree">
+                        <!-- 1세대: 조부모 -->
+                        <div class="generation grandparents">
+                            <div class="generation-label">1세대 (조부모)</div>
+                            <div class="grandparents-row">
+                                <!-- 부계 조부모 -->
+                                <div class="paternal-side">
+                                    <div class="grandparent-node" onclick="${paternalGrandfather ? `showAnimalDetails('${paternalGrandfather.id}')` : ''}">
+                                        <div class="node-image">
+                                            ${paternalGrandfather && paternalGrandfather.image ? 
+                                                `<img src="${paternalGrandfather.image}" alt="${paternalGrandfather.name}">` : 
+                                                '<i class="fas fa-dragon"></i>'
+                                            }
+                                        </div>
+                                        <div class="node-name">${paternalGrandfather ? paternalGrandfather.name : '할아버지'}</div>
+                                        <div class="node-role grandfather-role">할아버지</div>
+                                    </div>
+                                    
+                                    <div class="grandparent-node" onclick="${paternalGrandmother ? `showAnimalDetails('${paternalGrandmother.id}')` : ''}">
+                                        <div class="node-image">
+                                            ${paternalGrandmother && paternalGrandmother.image ? 
+                                                `<img src="${paternalGrandmother.image}" alt="${paternalGrandmother.name}">` : 
+                                                '<i class="fas fa-dragon"></i>'
+                                            }
+                                        </div>
+                                        <div class="node-name">${paternalGrandmother ? paternalGrandmother.name : '할머니'}</div>
+                                        <div class="node-role grandmother-role">할머니</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 모계 조부모 -->
+                                <div class="maternal-side">
+                                    <div class="grandparent-node" onclick="${maternalGrandfather ? `showAnimalDetails('${maternalGrandfather.id}')` : ''}">
+                                        <div class="node-image">
+                                            ${maternalGrandfather && maternalGrandfather.image ? 
+                                                `<img src="${maternalGrandfather.image}" alt="${maternalGrandfather.name}">` : 
+                                                '<i class="fas fa-dragon"></i>'
+                                            }
+                                        </div>
+                                        <div class="node-name">${maternalGrandfather ? maternalGrandfather.name : '외할아버지'}</div>
+                                        <div class="node-role grandfather-role">외할아버지</div>
+                                    </div>
+                                    
+                                    <div class="grandparent-node" onclick="${maternalGrandmother ? `showAnimalDetails('${maternalGrandmother.id}')` : ''}">
+                                        <div class="node-image">
+                                            ${maternalGrandmother && maternalGrandmother.image ? 
+                                                `<img src="${maternalGrandmother.image}" alt="${maternalGrandmother.name}">` : 
+                                                '<i class="fas fa-dragon"></i>'
+                                            }
+                                        </div>
+                                        <div class="node-name">${maternalGrandmother ? maternalGrandmother.name : '외할머니'}</div>
+                                        <div class="node-role grandmother-role">외할머니</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 연결선 -->
+                        <div class="connection-lines">
+                            <div class="connection-line grandparents-to-parents"></div>
+                        </div>
+                        
+                        <!-- 2세대: 부모 -->
+                        <div class="generation parents">
+                            <div class="generation-label">2세대 (부모)</div>
+                            <div class="parents-row">
+                                <div class="parent-node" onclick="${father ? `showAnimalDetails('${father.id}')` : ''}">
+                                    <div class="node-image">
+                                        ${father && father.image ? 
+                                            `<img src="${father.image}" alt="${father.name}">` : 
+                                            '<i class="fas fa-dragon"></i>'
+                                        }
+                                    </div>
+                                    <div class="node-name">${father ? father.name : '아빠'}</div>
+                                    <div class="node-role father-role">아빠</div>
+                                </div>
+                                
+                                <div class="parent-node" onclick="${mother ? `showAnimalDetails('${mother.id}')` : ''}">
+                                    <div class="node-image">
+                                        ${mother && mother.image ? 
+                                            `<img src="${mother.image}" alt="${mother.name}">` : 
+                                            '<i class="fas fa-dragon"></i>'
+                                        }
+                                    </div>
+                                    <div class="node-name">${mother ? mother.name : '엄마'}</div>
+                                    <div class="node-role mother-role">엄마</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 연결선 -->
+                        <div class="connection-lines">
+                            <div class="connection-line parents-to-current"></div>
+                        </div>
+                        
+                        <!-- 3세대: 현재 개체 -->
+                        <div class="generation current">
+                            <div class="generation-label">3세대 (현재)</div>
+                            <div class="current-node selected" onclick="showAnimalDetails('${animal.id}')">
+                                <div class="node-image">
+                                    ${animal.image ? 
+                                        `<img src="${animal.image}" alt="${animal.name}">` : 
+                                        '<i class="fas fa-dragon"></i>'
+                                    }
+                                </div>
+                                <div class="node-name">${animal.name}</div>
+                                <div class="node-role current-role">자식</div>
+                            </div>
+                        </div>
+                        
+                        <!-- 연결선 -->
+                        ${children.length > 0 ? '<div class="connection-lines"><div class="connection-line current-to-children"></div></div>' : ''}
+                        
+                        <!-- 4세대: 자손 -->
+                        <div class="generation children">
+                            <div class="generation-label">4세대 (자손)</div>
+                            <div class="children-row">
+                                ${children.length > 0 ? children.map(child => `
+                                    <div class="child-node" onclick="showAnimalDetails('${child.id}')">
+                                        <div class="node-image">
+                                            ${child.image ? 
+                                                `<img src="${child.image}" alt="${child.name}">` : 
+                                                '<i class="fas fa-dragon"></i>'
+                                            }
+                                        </div>
+                                        <div class="node-name">${child.name}</div>
+                                        <div class="node-role child-role">손자/손녀</div>
+                                    </div>
+                                `).join('') : `
+                                    <div class="child-node empty">
+                                        <div class="node-image">
+                                            <i class="fas fa-plus"></i>
+                                        </div>
+                                        <div class="node-name">새 개체</div>
+                                        <div class="node-role empty-role">등록 필요</div>
+                                    </div>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="family-tree-info">
+                        <p class="info-text">
+                            ${father || mother ? '가족 관계가 연결되어 있습니다.' : '부모 정보를 등록하면 더 자세한 관계도를 볼 수 있습니다.'}
+                        </p>
+                        <div class="register-buttons">
+                            <a href="register.html" class="btn">
+                                <i class="fas fa-plus"></i> 새 개체 등록
+                            </a>
+                            ${father || mother ? `
+                                <button onclick="registerWithParents('${animal.id}')" class="btn btn-success">
+                                    <i class="fas fa-baby"></i> 자손 등록 (부모 자동 선택)
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('treeContent').innerHTML = treeHTML;
+        }
+
+        function searchAnimals() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            if (searchTerm.length < 2) {
+                document.getElementById('searchResults').style.display = 'none';
+                return;
+            }
+
+            const filtered = allAnimals.filter(animal => 
+                animal.name.toLowerCase().includes(searchTerm)
+            );
+
+            showSearchResults(filtered);
+        }
+
+        function showSearchResults(animals = null) {
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (!animals) {
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                animals = allAnimals.filter(animal => 
+                    animal.name.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            if (animals.length === 0) {
+                resultsDiv.innerHTML = '<div style="padding: 15px; text-align: center; color: #718096;">검색 결과가 없습니다.</div>';
+            } else {
+                resultsDiv.innerHTML = animals.map(animal => `
+                    <div class="search-result-item" onclick="selectAnimal('${animal.id}')">
+                        <div class="animal-image">
+                            ${animal.image ? 
+                                `<img src="${animal.image}" alt="${animal.name}">` : 
+                                '<i class="fas fa-dragon" style="font-size: 1.5rem; color: #667eea;"></i>'
+                            }
+                        </div>
+                        <div class="search-result-info">
+                            <div class="search-result-name">${animal.name}</div>
+                            <div class="search-result-details">
+                                ${animal.generation} | ${animal.gender} | ${animal.status === 'active' ? '보유 중' : animal.status === 'sold' ? '분양 완료' : '사망'}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            resultsDiv.style.display = 'block';
+        }
+
+        // 상세 정보 모달 관련 함수들
+        function showAnimalDetails(animalId) {
+            const animal = allAnimals.find(a => a.id === animalId);
+            if (!animal) return;
+
+            const modal = document.getElementById('animalDetailModal');
+            const modalContent = document.getElementById('modalContent');
+            
+            // 부모 정보 찾기
+            const father = animal.fatherId ? allAnimals.find(a => a.id === animal.fatherId) : null;
+            const mother = animal.motherId ? allAnimals.find(a => a.id === animal.motherId) : null;
+            
+            // 자손 정보 찾기
+            const children = allAnimals.filter(a => 
+                (a.fatherId === animal.id || a.motherId === animal.id) && a.id !== animal.id
+            );
+
+            modalContent.innerHTML = `
+                <div class="modal-header">
+                    <h3 class="modal-title">${animal.name} 상세 정보</h3>
+                    <span class="close" onclick="closeAnimalDetails()">&times;</span>
+                </div>
+                <div class="modal-body">
+                    ${animal.image ? `<img src="${animal.image}" alt="${animal.name}" class="detail-image">` : ''}
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">이름:</span>
+                        <span class="detail-value">${animal.name}</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">성별:</span>
+                        <span class="detail-value">${animal.gender}</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">세대:</span>
+                        <span class="detail-value">${animal.generation}</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">상태:</span>
+                        <span class="detail-value">${getStatusText(animal.status)}</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">형질:</span>
+                        <span class="detail-value">${animal.morph || '미정'}</span>
+                    </div>
+                    
+                    ${father ? `
+                        <div class="detail-row">
+                            <span class="detail-label">부개체:</span>
+                            <span class="detail-value">${father.name}</span>
+                        </div>
+                    ` : ''}
+                    
+                    ${mother ? `
+                        <div class="detail-row">
+                            <span class="detail-label">모개체:</span>
+                            <span class="detail-value">${mother.name}</span>
+                        </div>
+                    ` : ''}
+                    
+                    ${children.length > 0 ? `
+                        <div class="detail-row">
+                            <span class="detail-label">자손:</span>
+                            <span class="detail-value">${children.map(child => child.name).join(', ')}</span>
+                        </div>
+                    ` : ''}
+                    
+                    ${animal.notes ? `
+                        <div class="detail-notes">
+                            <h4>📝 특이사항</h4>
+                            <p>${animal.notes}</p>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">등록일:</span>
+                        <span class="detail-value">${new Date(animal.createdAt).toLocaleDateString('ko-KR')}</span>
+                    </div>
+                </div>
+            `;
+            
+            modal.style.display = 'block';
+        }
+
+        function closeAnimalDetails() {
+            document.getElementById('animalDetailModal').style.display = 'none';
+        }
+
+        function getStatusText(status) {
+            switch(status) {
+                case 'active': return '보유 중';
+                case 'sold': return '분양 완료';
+                case 'deceased': return '사망';
+                default: return '미정';
+            }
+        }
+
+        // 자손 등록 함수 (부모 자동 선택)
+        function registerWithParents(parentId) {
+            const parent = allAnimals.find(a => a.id === parentId);
+            if (!parent) return;
+
+            // 부모 정보를 URL 파라미터로 전달
+            const params = new URLSearchParams();
+            params.append('parentId', parentId);
+            params.append('parentName', parent.name);
+            params.append('parentGender', parent.gender);
+            
+            // 부모의 세대에 따라 자손 세대 결정
+            let childGeneration;
+            switch(parent.generation) {
+                case 'F1': childGeneration = 'F2'; break;
+                case 'F2': childGeneration = 'F3'; break;
+                case 'F3': childGeneration = 'F4'; break;
+                case 'F4': childGeneration = 'F5'; break;
+                default: childGeneration = 'F2';
+            }
+            params.append('childGeneration', childGeneration);
+            
+            // register.html로 이동
+            window.location.href = `register.html?${params.toString()}`;
+        }
+
+        // 모달 외부 클릭 시 닫기
+        window.onclick = function(event) {
+            const modal = document.getElementById('animalDetailModal');
+            if (event.target === modal) {
+                closeAnimalDetails();
+            }
+        }
+
+        // 페이지 로드 시 초기화
+        window.onload = function() {
+            loadAnimals();
+        };
+    </script>
+</body>
+</html> 

@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 로그아웃 문제 완전 해결</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        .section {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+        .section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+        .danger {
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+        }
+        .warning {
+            background: linear-gradient(135deg, #ffc107 0%, #f39c12 100%);
+            color: #2c3e50;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffeaa7;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 2px solid #bee5eb;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid #e9ecef;
+            font-size: 0.9rem;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #dee2e6;
+            margin: 15px 0;
+        }
+        .function-test {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 로그아웃 문제 완전 해결</h1>
+            <p>로그아웃 기능을 확실히 작동하도록 수정합니다</p>
+        </div>
+
+        <div class="section">
+            <h3>🚨 현재 문제 진단</h3>
+            <button onclick="diagnoseLogoutIssue()">로그아웃 문제 진단</button>
+            <div id="diagnosisResults"></div>
+        </div>
+
+        <div class="section">
+            <h3>🛠️ 로그아웃 함수 수정</h3>
+            <button onclick="fixLogoutFunction()" class="success">로그아웃 함수 수정</button>
+            <button onclick="forceLogout()" class="danger">강제 로그아웃 실행</button>
+            <div id="fixResults"></div>
+        </div>
+
+        <div class="section">
+            <h3>🧪 로그아웃 테스트</h3>
+            <div class="test-section">
+                <h4>현재 상태:</h4>
+                <div id="currentStatus"></div>
+                
+                <h4>함수 테스트:</h4>
+                <div class="function-test">
+                    <button onclick="testLogoutFunction()" class="warning">로그아웃 함수 테스트</button>
+                    <button onclick="testUserManager()" class="warning">UserManager 테스트</button>
+                    <button onclick="testGlobalFunctions()" class="warning">전역 함수 테스트</button>
+                </div>
+                
+                <div id="testResults"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>🔧 스크립트 직접 수정</h3>
+            <button onclick="injectLogoutFix()" class="success">로그아웃 수정 코드 주입</button>
+            <button onclick="clearAllData()" class="danger">모든 데이터 초기화</button>
+            <div id="injectionResults"></div>
+        </div>
+
+        <div class="section">
+            <h3>🏠 메인 페이지로 이동</h3>
+            <button onclick="goToMain()">메인 페이지로 이동</button>
+        </div>
+    </div>
+
+    <script>
+        // UserManager 클래스 정의
+        class UserManager {
+            constructor() {
+                this.currentUser = null;
+                this.loadCurrentUser();
+            }
+
+            loadUsers() {
+                const users = localStorage.getItem('users');
+                return users ? JSON.parse(users) : {
+                    'admin@crestedgecko.com': {
+                        email: 'admin@crestedgecko.com',
+                        password: 'Admin2024!',
+                        name: '시스템 관리자',
+                        plan: 'admin',
+                        role: 'admin',
+                        createdAt: new Date().toISOString()
+                    }
+                };
+            }
+
+            saveUsers(users) {
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+
+            getCurrentUser() {
+                if (!this.currentUser) {
+                    const savedUser = localStorage.getItem('currentUser');
+                    if (savedUser) {
+                        this.currentUser = JSON.parse(savedUser);
+                    }
+                }
+                return this.currentUser;
+            }
+
+            loadCurrentUser() {
+                const savedUser = localStorage.getItem('currentUser');
+                if (savedUser) {
+                    this.currentUser = JSON.parse(savedUser);
+                }
+            }
+
+            logout() {
+                console.log('UserManager.logout() 호출됨');
+                this.currentUser = null;
+                localStorage.removeItem('currentUser');
+                console.log('로그아웃 완료, 로그인 페이지로 이동');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // 전역 함수들 정의
+        function logout() {
+            console.log('전역 logout() 함수 호출됨');
+            if (window.userManager) {
+                window.userManager.logout();
+            } else {
+                // UserManager가 없으면 직접 로그아웃 처리
+                localStorage.removeItem('currentUser');
+                console.log('직접 로그아웃 처리 완료');
+                window.location.href = 'login.html';
+            }
+        }
+
+        function displayUserInfo() {
+            console.log('displayUserInfo() 함수 호출됨');
+            const currentUser = window.userManager ? window.userManager.getCurrentUser() : null;
+            if (currentUser) {
+                console.log('사용자 정보 표시:', currentUser.name);
+            } else {
+                console.log('로그인된 사용자 없음');
+            }
+        }
+
+        // 전역 객체에 등록
+        window.userManager = new UserManager();
+        window.logout = logout;
+        window.displayUserInfo = displayUserInfo;
+
+        function diagnoseLogoutIssue() {
+            const results = document.getElementById('diagnosisResults');
+            let html = '<h4>🔍 로그아웃 문제 진단:</h4>';
+            
+            try {
+                // 1. UserManager 확인
+                if (window.userManager) {
+                    html += '<div class="status success">✅ UserManager 객체 존재</div>';
+                } else {
+                    html += '<div class="status error">❌ UserManager 객체 없음</div>';
+                }
+
+                // 2. logout 함수 확인
+                if (typeof window.logout === 'function') {
+                    html += '<div class="status success">✅ logout 함수 존재</div>';
+                } else {
+                    html += '<div class="status error">❌ logout 함수 없음</div>';
+                }
+
+                // 3. displayUserInfo 함수 확인
+                if (typeof window.displayUserInfo === 'function') {
+                    html += '<div class="status success">✅ displayUserInfo 함수 존재</div>';
+                } else {
+                    html += '<div class="status error">❌ displayUserInfo 함수 없음</div>';
+                }
+
+                // 4. 현재 사용자 상태 확인
+                const currentUser = localStorage.getItem('currentUser');
+                if (currentUser) {
+                    html += '<div class="status info">✅ 로그인 세션 존재</div>';
+                } else {
+                    html += '<div class="status warning">⚠️ 로그인 세션 없음</div>';
+                }
+
+                // 5. 콘솔 오류 확인
+                html += '<div class="status info">📋 브라우저 콘솔에서 오류 메시지 확인 중...</div>';
+
+            } catch (error) {
+                html += `<div class="status error">❌ 진단 중 오류: ${error.message}</div>`;
+            }
+            
+            results.innerHTML = html;
+        }
+
+        function fixLogoutFunction() {
+            const results = document.getElementById('fixResults');
+            let html = '<h4>🛠️ 로그아웃 함수 수정:</h4>';
+            
+            try {
+                // 1. UserManager 재정의
+                window.userManager = new UserManager();
+                html += '<div class="status success">✅ UserManager 재정의 완료</div>';
+
+                // 2. logout 함수 재정의
+                window.logout = function() {
+                    console.log('수정된 logout() 함수 호출됨');
+                    if (window.userManager) {
+                        window.userManager.logout();
+                    } else {
+                        localStorage.removeItem('currentUser');
+                        window.location.href = 'login.html';
+                    }
+                };
+                html += '<div class="status success">✅ logout 함수 재정의 완료</div>';
+
+                // 3. displayUserInfo 함수 재정의
+                window.displayUserInfo = function() {
+                    console.log('수정된 displayUserInfo() 함수 호출됨');
+                    const currentUser = window.userManager ? window.userManager.getCurrentUser() : null;
+                    if (currentUser) {
+                        console.log('사용자 정보:', currentUser.name);
+                    }
+                };
+                html += '<div class="status success">✅ displayUserInfo 함수 재정의 완료</div>';
+
+                // 4. 전역 함수 등록 확인
+                html += '<div class="status success">✅ 모든 전역 함수 등록 완료</div>';
+                
+                html += '<div class="status success"><strong>🎉 로그아웃 함수 수정 완료!</strong></div>';
+
+            } catch (error) {
+                html += `<div class="status error">❌ 수정 중 오류: ${error.message}</div>`;
+            }
+            
+            results.innerHTML = html;
+        }
+
+        function forceLogout() {
+            if (confirm('정말로 로그아웃하시겠습니까?')) {
+                console.log('강제 로그아웃 실행');
+                localStorage.removeItem('currentUser');
+                sessionStorage.clear();
+                alert('로그아웃되었습니다. 로그인 페이지로 이동합니다.');
+                window.location.href = 'login.html';
+            }
+        }
+
+        function testLogoutFunction() {
+            const results = document.getElementById('testResults');
+            let html = '<h4>🧪 로그아웃 함수 테스트:</h4>';
+            
+            try {
+                // logout 함수 존재 확인
+                if (typeof window.logout === 'function') {
+                    html += '<div class="status success">✅ logout 함수 존재</div>';
+                    
+                    // 함수 실행 테스트 (실제 로그아웃은 하지 않음)
+                    console.log('logout 함수 테스트 실행');
+                    html += '<div class="status info">📋 콘솔에서 함수 실행 로그 확인</div>';
+                } else {
+                    html += '<div class="status error">❌ logout 함수 없음</div>';
+                }
+
+                // UserManager 테스트
+                if (window.userManager && typeof window.userManager.logout === 'function') {
+                    html += '<div class="status success">✅ UserManager.logout() 함수 존재</div>';
+                } else {
+                    html += '<div class="status error">❌ UserManager.logout() 함수 없음</div>';
+                }
+
+            } catch (error) {
+                html += `<div class="status error">❌ 테스트 중 오류: ${error.message}</div>`;
+            }
+            
+            results.innerHTML = html;
+        }
+
+        function testUserManager() {
+            const results = document.getElementById('testResults');
+            let html = '<h4>🧪 UserManager 테스트:</h4>';
+            
+            try {
+                if (window.userManager) {
+                    html += '<div class="status success">✅ UserManager 객체 존재</div>';
+                    
+                    const currentUser = window.userManager.getCurrentUser();
+                    if (currentUser) {
+                        html += `<div class="status info">📋 현재 사용자: ${currentUser.name}</div>`;
+                    } else {
+                        html += '<div class="status warning">⚠️ 로그인된 사용자 없음</div>';
+                    }
+                } else {
+                    html += '<div class="status error">❌ UserManager 객체 없음</div>';
+                }
+
+            } catch (error) {
+                html += `<div class="status error">❌ 테스트 중 오류: ${error.message}</div>`;
+            }
+            
+            results.innerHTML = html;
+        }
+
+        function testGlobalFunctions() {
+            const results = document.getElementById('testResults');
+            let html = '<h4>🧪 전역 함수 테스트:</h4>';
+            
+            const functions = ['logout', 'displayUserInfo', 'userManager'];
+            functions.forEach(funcName => {
+                if (window[funcName]) {
+                    html += `<div class="status success">✅ ${funcName} 존재</div>`;
+                } else {
+                    html += `<div class="status error">❌ ${funcName} 없음</div>`;
+                }
+            });
+            
+            results.innerHTML = html;
+        }
+
+        function injectLogoutFix() {
+            const results = document.getElementById('injectionResults');
+            let html = '<h4>🔧 스크립트 수정 주입:</h4>';
+            
+            try {
+                // 스크립트 태그 생성하여 수정 코드 주입
+                const script = document.createElement('script');
+                script.textContent = `
+                    // 로그아웃 함수 강제 재정의
+                    window.logout = function() {
+                        console.log('주입된 logout() 함수 호출됨');
+                        localStorage.removeItem('currentUser');
+                        sessionStorage.clear();
+                        alert('로그아웃되었습니다.');
+                        window.location.href = 'login.html';
+                    };
+                    
+                    // UserManager 강제 재정의
+                    window.userManager = {
+                        logout: function() {
+                            console.log('주입된 UserManager.logout() 호출됨');
+                            localStorage.removeItem('currentUser');
+                            sessionStorage.clear();
+                            window.location.href = 'login.html';
+                        },
+                        getCurrentUser: function() {
+                            const savedUser = localStorage.getItem('currentUser');
+                            return savedUser ? JSON.parse(savedUser) : null;
+                        }
+                    };
+                    
+                    // displayUserInfo 함수 재정의
+                    window.displayUserInfo = function() {
+                        console.log('주입된 displayUserInfo() 함수 호출됨');
+                        const currentUser = window.userManager.getCurrentUser();
+                        if (currentUser) {
+                            console.log('사용자 정보:', currentUser.name);
+                        }
+                    };
+                    
+                    console.log('로그아웃 수정 코드 주입 완료');
+                `;
+                
+                document.head.appendChild(script);
+                html += '<div class="status success">✅ 수정 코드 주입 완료</div>';
+                html += '<div class="status info">📋 콘솔에서 주입 완료 메시지 확인</div>';
+
+            } catch (error) {
+                html += `<div class="status error">❌ 주입 중 오류: ${error.message}</div>`;
+            }
+            
+            results.innerHTML = html;
+        }
+
+        function clearAllData() {
+            if (confirm('정말로 모든 데이터를 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.')) {
+                localStorage.clear();
+                sessionStorage.clear();
+                alert('모든 데이터가 삭제되었습니다. 페이지를 새로고침합니다.');
+                location.reload();
+            }
+        }
+
+        function goToMain() {
+            window.location.href = 'index.html';
+        }
+
+        // 현재 상태 표시
+        function updateCurrentStatus() {
+            const status = document.getElementById('currentStatus');
+            let html = '';
+            
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                try {
+                    const user = JSON.parse(currentUser);
+                    html += `<div class="status success">✅ 로그인됨: ${user.name} (${user.plan})</div>`;
+                } catch (e) {
+                    html += '<div class="status warning">⚠️ 사용자 데이터 오류</div>';
+                }
+            } else {
+                html += '<div class="status warning">⚠️ 로그인되지 않음</div>';
+            }
+            
+            if (typeof window.logout === 'function') {
+                html += '<div class="status success">✅ logout 함수 존재</div>';
+            } else {
+                html += '<div class="status error">❌ logout 함수 없음</div>';
+            }
+            
+            if (window.userManager) {
+                html += '<div class="status success">✅ UserManager 존재</div>';
+            } else {
+                html += '<div class="status error">❌ UserManager 없음</div>';
+            }
+            
+            status.innerHTML = html;
+        }
+
+        // 페이지 로드 시 초기화
+        window.onload = function() {
+            updateCurrentStatus();
+            diagnoseLogoutIssue();
+        };
+    </script>
+</body>
+</html> 

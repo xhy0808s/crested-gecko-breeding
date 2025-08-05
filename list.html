@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>개체 목록 - 크레스티드 게코 브리딩 관리</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #4a5568;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #fa709a, #fee140);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .animals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .animal-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .animal-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .animal-image {
+            width: 100%;
+            height: 200px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+
+        .animal-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .animal-info h3 {
+            color: #4a5568;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .animal-details {
+            color: #718096;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .animal-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-generation {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .badge-gender {
+            background: #fce4ec;
+            color: #c2185b;
+        }
+
+        .badge-status {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .badge-status.sold {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-status.deceased {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .morph-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .morph-tag {
+            background: #f0f4ff;
+            color: #667eea;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .action-buttons .btn {
+            flex: 1;
+            min-width: 80px;
+            font-size: 0.9rem;
+            padding: 8px 12px;
+        }
+
+        .no-animals {
+            text-align: center;
+            padding: 60px 20px;
+            color: #718096;
+            font-size: 1.2rem;
+        }
+
+        .no-animals i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* 수정 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .modal-header h2 {
+            color: #4a5568;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .close {
+            color: #718096;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .search-filters {
+                grid-template-columns: 1fr;
+            }
+            
+            .animals-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .control-buttons {
+                flex-direction: column;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+                padding: 20px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> 메인으로 돌아가기
+        </a>
+
+        <div class="header">
+            <h1>🦎 개체 목록</h1>
+            <p>등록된 모든 크레스티드 게코를 확인하고 관리하세요</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalAnimals">0</div>
+                <div class="stat-label">전체 개체</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="activeAnimals">0</div>
+                <div class="stat-label">보유 중</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="soldAnimals">0</div>
+                <div class="stat-label">분양 완료</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="deceasedAnimals">0</div>
+                <div class="stat-label">사망</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="search-filters">
+                <input type="text" id="searchInput" class="form-control" placeholder="개체 이름 검색..." onkeyup="filterAnimals()">
+                <select id="statusFilter" class="form-control" onchange="filterAnimals()">
+                    <option value="">모든 상태</option>
+                    <option value="active">보유 중</option>
+                    <option value="sold">분양 완료</option>
+                    <option value="deceased">사망</option>
+                </select>
+                <select id="generationFilter" class="form-control" onchange="filterAnimals()">
+                    <option value="">모든 세대</option>
+                    <option value="F1">F1 세대</option>
+                    <option value="F2">F2 세대</option>
+                    <option value="F3">F3 세대</option>
+                    <option value="F4">F4 세대</option>
+                    <option value="F5">F5 세대</option>
+                </select>
+                <select id="genderFilter" class="form-control" onchange="filterAnimals()">
+                    <option value="">모든 성별</option>
+                    <option value="수컷">수컷</option>
+                    <option value="암컷">암컷</option>
+                </select>
+            </div>
+
+            <div class="control-buttons">
+                <button onclick="refreshAnimals()" class="btn">
+                    <i class="fas fa-sync-alt"></i> 새로고침
+                </button>
+                <button onclick="exportData()" class="btn btn-success">
+                    <i class="fas fa-download"></i> 데이터 내보내기
+                </button>
+                <button onclick="clearAllData()" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> 모든 데이터 삭제
+                </button>
+            </div>
+        </div>
+
+        <div id="animalsContainer">
+            <div class="no-animals">
+                <i class="fas fa-dragon"></i>
+                <p>등록된 개체가 없습니다.</p>
+                <a href="register.html" class="btn" style="margin-top: 20px;">
+                    <i class="fas fa-plus"></i> 첫 번째 개체 등록하기
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 수정 모달 -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-edit"></i> 개체 정보 수정</h2>
+                <span class="close" onclick="closeEditModal()">&times;</span>
+            </div>
+            
+            <form id="editForm">
+                <input type="hidden" id="editAnimalId" name="animalId">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editName">이름 *</label>
+                        <input type="text" id="editName" name="name" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editGender">성별 *</label>
+                        <select id="editGender" name="gender" class="form-control" required>
+                            <option value="수컷">수컷</option>
+                            <option value="암컷">암컷</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editGeneration">세대 *</label>
+                        <select id="editGeneration" name="generation" class="form-control" required onchange="toggleEditParentFields()">
+                            <option value="F1">F1</option>
+                            <option value="F2">F2</option>
+                            <option value="F3">F3</option>
+                            <option value="F4">F4</option>
+                            <option value="F5">F5</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editStatus">상태 *</label>
+                        <select id="editStatus" name="status" class="form-control" required>
+                            <option value="active">보유 중</option>
+                            <option value="sold">분양 완료</option>
+                            <option value="deceased">사망</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editMorph">모프</label>
+                    <input type="text" id="editMorph" name="morph" class="form-control" placeholder="예: 화이트스팟, 화이트크로우, 레오파드">
+                </div>
+                
+                <div id="editParentFields" style="display: none;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editFatherSelect">부개체</label>
+                            <select id="editFatherSelect" name="fatherId" class="form-control">
+                                <option value="">부개체 선택</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="editMotherSelect">모개체</label>
+                            <select id="editMotherSelect" name="motherId" class="form-control">
+                                <option value="">모개체 선택</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editNotes">메모</label>
+                    <textarea id="editNotes" name="notes" class="form-control" rows="3" placeholder="특이사항이나 메모를 입력하세요"></textarea>
+                </div>
+                
+                <div class="modal-buttons">
+                    <button type="button" onclick="closeEditModal()" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> 취소
+                    </button>
+                    <button type="button" onclick="saveEdit()" class="btn btn-success">
+                        <i class="fas fa-save"></i> 저장
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 개인 사용자 설정
+        const user = {
+            name: '개인 사용자',
+            createdAt: new Date().toISOString()
+        };
+
+        // 로컬 스토리지에 사용자 정보 저장
+        localStorage.setItem('currentUser', JSON.stringify(user));
+
+        let allAnimals = [];
+
+        function loadAnimals() {
+            allAnimals = JSON.parse(localStorage.getItem('animals') || '[]');
+            updateStats();
+            displayAnimals(allAnimals);
+        }
+
+        function updateStats() {
+            const total = allAnimals.length;
+            const active = allAnimals.filter(a => a.status === 'active').length;
+            const sold = allAnimals.filter(a => a.status === 'sold').length;
+            const deceased = allAnimals.filter(a => a.status === 'deceased').length;
+
+            document.getElementById('totalAnimals').textContent = total;
+            document.getElementById('activeAnimals').textContent = active;
+            document.getElementById('soldAnimals').textContent = sold;
+            document.getElementById('deceasedAnimals').textContent = deceased;
+        }
+
+        function displayAnimals(animals) {
+            const container = document.getElementById('animalsContainer');
+            
+            if (animals.length === 0) {
+                container.innerHTML = `
+                    <div class="no-animals">
+                        <i class="fas fa-dragon"></i>
+                        <p>등록된 개체가 없습니다.</p>
+                        <a href="register.html" class="btn" style="margin-top: 20px;">
+                            <i class="fas fa-plus"></i> 첫 번째 개체 등록하기
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="animals-grid">
+                    ${animals.map(animal => createAnimalCard(animal)).join('')}
+                </div>
+            `;
+        }
+
+        function createAnimalCard(animal) {
+            const statusClass = animal.status === 'sold' ? 'sold' : animal.status === 'deceased' ? 'deceased' : '';
+            const statusText = animal.status === 'active' ? '보유 중' : 
+                             animal.status === 'sold' ? '분양 완료' : '사망';
+
+            return `
+                <div class="animal-card">
+                    <div class="animal-image">
+                        ${animal.image ? 
+                            `<img src="${animal.image}" alt="${animal.name}">` : 
+                            '<i class="fas fa-dragon"></i>'
+                        }
+                    </div>
+                    
+                    <div class="animal-info">
+                        <h3>${animal.name}</h3>
+                        
+                        <div class="animal-badges">
+                            <span class="badge badge-generation">${animal.generation}</span>
+                            <span class="badge badge-gender">${animal.gender}</span>
+                            <span class="badge badge-status ${statusClass}">${statusText}</span>
+                        </div>
+                        
+                        <div class="animal-details">
+                            <p><strong>카테고리:</strong> ${getCategoryText(animal.category)}</p>
+                            <p><strong>등록일:</strong> ${new Date(animal.createdAt).toLocaleDateString()}</p>
+                        </div>
+                        
+                        ${animal.morphs && animal.morphs.length > 0 ? `
+                            <div class="morph-tags">
+                                ${animal.morphs.map(morph => `<span class="morph-tag">${morph}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                        
+                        <div class="action-buttons">
+                            <button onclick="editAnimal('${animal.id}')" class="btn btn-secondary">
+                                <i class="fas fa-edit"></i> 수정
+                            </button>
+                            <button onclick="deleteAnimal('${animal.id}')" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> 삭제
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getCategoryText(category) {
+            const categories = {
+                'breeding': '번식용',
+                'pet': '펫용',
+                'show': '쇼용',
+                'research': '연구용',
+                'sale': '판매용'
+            };
+            return categories[category] || category;
+        }
+
+        function filterAnimals() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const generationFilter = document.getElementById('generationFilter').value;
+            const genderFilter = document.getElementById('genderFilter').value;
+
+            const filtered = allAnimals.filter(animal => {
+                const matchesSearch = animal.name.toLowerCase().includes(searchTerm);
+                const matchesStatus = !statusFilter || animal.status === statusFilter;
+                const matchesGeneration = !generationFilter || animal.generation === generationFilter;
+                const matchesGender = !genderFilter || animal.gender === genderFilter;
+
+                return matchesSearch && matchesStatus && matchesGeneration && matchesGender;
+            });
+
+            displayAnimals(filtered);
+        }
+
+        function refreshAnimals() {
+            loadAnimals();
+        }
+
+        function editAnimal(id) {
+            const animal = allAnimals.find(a => a.id === id);
+            if (!animal) {
+                console.log('개체를 찾을 수 없습니다:', id);
+                return;
+            }
+            
+            console.log('수정 모달 열기:', animal.name);
+            // 수정 모달 표시
+            showEditModal(animal);
+        }
+        
+        function showEditModal(animal) {
+            console.log('showEditModal 호출됨:', animal);
+            
+            const modal = document.getElementById('editModal');
+            if (!modal) {
+                console.error('editModal을 찾을 수 없습니다!');
+                return;
+            }
+            
+            const form = document.getElementById('editForm');
+            if (!form) {
+                console.error('editForm을 찾을 수 없습니다!');
+                return;
+            }
+            
+            // 폼 필드에 현재 값 설정
+            const nameField = document.getElementById('editName');
+            const genderField = document.getElementById('editGender');
+            const generationField = document.getElementById('editGeneration');
+            const statusField = document.getElementById('editStatus');
+            const morphField = document.getElementById('editMorph');
+            const notesField = document.getElementById('editNotes');
+            const animalIdField = document.getElementById('editAnimalId');
+            
+            if (nameField) nameField.value = animal.name;
+            if (genderField) genderField.value = animal.gender;
+            if (generationField) generationField.value = animal.generation;
+            if (statusField) statusField.value = animal.status;
+            if (morphField) morphField.value = animal.morph || '';
+            if (notesField) notesField.value = animal.notes || '';
+            if (animalIdField) animalIdField.value = animal.id;
+            
+            // 부모 선택 필드 설정
+            const fatherSelect = document.getElementById('editFatherSelect');
+            const motherSelect = document.getElementById('editMotherSelect');
+            
+            if (fatherSelect && animal.fatherId) {
+                fatherSelect.value = animal.fatherId;
+            }
+            if (motherSelect && animal.motherId) {
+                motherSelect.value = animal.motherId;
+            }
+            
+            // 세대에 따라 부모 필드 표시/숨김
+            toggleEditParentFields();
+            
+            // 모달 표시
+            modal.style.display = 'block';
+            console.log('모달 표시 완료');
+        }
+        
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+        
+        function toggleEditParentFields() {
+            const generation = document.getElementById('editGeneration').value;
+            const parentFields = document.getElementById('editParentFields');
+            
+            if (generation !== 'F1') {
+                parentFields.style.display = 'block';
+                loadEditParentOptions();
+            } else {
+                parentFields.style.display = 'none';
+            }
+        }
+        
+        function loadEditParentOptions() {
+            const fatherSelect = document.getElementById('editFatherSelect');
+            const motherSelect = document.getElementById('editMotherSelect');
+            
+            // 기존 옵션 제거
+            fatherSelect.innerHTML = '<option value="">부개체 선택</option>';
+            motherSelect.innerHTML = '<option value="">모개체 선택</option>';
+            
+            // 활성 상태의 개체들만 필터링
+            const activeAnimals = allAnimals.filter(a => a.status === 'active');
+            
+            // 부개체 옵션 (수컷만)
+            activeAnimals.filter(a => a.gender === '수컷').forEach(animal => {
+                const option = document.createElement('option');
+                option.value = animal.id;
+                option.textContent = `${animal.name} (${animal.generation})`;
+                fatherSelect.appendChild(option);
+            });
+            
+            // 모개체 옵션 (암컷만)
+            activeAnimals.filter(a => a.gender === '암컷').forEach(animal => {
+                const option = document.createElement('option');
+                option.value = animal.id;
+                option.textContent = `${animal.name} (${animal.generation})`;
+                motherSelect.appendChild(option);
+            });
+        }
+        
+        function saveEdit() {
+            const form = document.getElementById('editForm');
+            const formData = new FormData(form);
+            
+            // 유효성 검사
+            if (!formData.get('name').trim()) {
+                alert('이름을 입력해주세요.');
+                return;
+            }
+            
+            // F2 이상 세대는 부모 중 하나는 필수
+            const generation = formData.get('generation');
+            if (generation !== 'F1') {
+                const fatherId = formData.get('fatherId');
+                const motherId = formData.get('motherId');
+                
+                if (!fatherId && !motherId) {
+                    alert('F2 이상 세대는 부개체와 모개체 중 하나는 반드시 선택해야 합니다.');
+                    return;
+                }
+            }
+            
+            // 기존 개체 찾기
+            const animalId = formData.get('animalId');
+            const animalIndex = allAnimals.findIndex(a => a.id === animalId);
+            
+            if (animalIndex === -1) {
+                alert('수정할 개체를 찾을 수 없습니다.');
+                return;
+            }
+            
+            // 개체 정보 업데이트
+            const updatedAnimal = {
+                ...allAnimals[animalIndex],
+                name: formData.get('name'),
+                gender: formData.get('gender'),
+                generation: formData.get('generation'),
+                status: formData.get('status'),
+                morph: formData.get('morph'),
+                notes: formData.get('notes'),
+                fatherId: formData.get('fatherId') || null,
+                motherId: formData.get('motherId') || null,
+                updatedAt: new Date().toISOString()
+            };
+            
+            // 배열 업데이트
+            allAnimals[animalIndex] = updatedAnimal;
+            
+            // 로컬 스토리지에 저장
+            try {
+                localStorage.setItem('animals', JSON.stringify(allAnimals));
+                alert('개체 정보가 성공적으로 수정되었습니다.');
+                closeEditModal();
+                refreshAnimals();
+            } catch (error) {
+                alert('저장 중 오류가 발생했습니다: ' + error.message);
+            }
+        }
+
+        function deleteAnimal(id) {
+            if (confirm('정말로 이 개체를 삭제하시겠습니까?')) {
+                allAnimals = allAnimals.filter(a => a.id !== id);
+                localStorage.setItem('animals', JSON.stringify(allAnimals));
+                loadAnimals();
+            }
+        }
+
+        function exportData() {
+            const dataStr = JSON.stringify(allAnimals, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `animals_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function clearAllData() {
+            if (confirm('정말로 모든 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+                localStorage.removeItem('animals');
+                allAnimals = [];
+                loadAnimals();
+            }
+        }
+
+        // 페이지 로드 시 초기화
+        window.onload = function() {
+            loadAnimals();
+        };
+    </script>
+</body>
+</html> 

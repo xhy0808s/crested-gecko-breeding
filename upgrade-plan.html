@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>최고 플랜 업그레이드</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .plan-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .plan-card::before {
+            content: "⭐ 최고 플랜";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .plan-name {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .plan-price {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .plan-features {
+            text-align: left;
+            margin: 20px 0;
+        }
+        
+        .plan-features ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .plan-features li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .plan-features li:before {
+            content: "✓";
+            color: #4CAF50;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            margin: 10px;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .success {
+            background: #4CAF50;
+        }
+        
+        .warning {
+            background: #ff9800;
+        }
+        
+        .info {
+            background: #2196F3;
+        }
+        
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .current-user {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #2196f3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 최고 플랜 업그레이드</h1>
+        
+        <div id="currentUserInfo" class="current-user">
+            <h3>현재 사용자 정보</h3>
+            <div id="userInfo">로딩 중...</div>
+        </div>
+        
+        <div class="plan-card">
+            <div class="plan-name">Lifetime Pro</div>
+            <div class="plan-price">₩299,000</div>
+            <div class="plan-features">
+                <ul>
+                    <li>무제한 동물 등록</li>
+                    <li>무제한 세대 관리 (F1~F5)</li>
+                    <li>무제한 이미지 업로드</li>
+                    <li>고급 AI 예측 기능</li>
+                    <li>고급 분석 도구</li>
+                    <li>번식 계획 도구</li>
+                    <li>PDF 내보내기</li>
+                    <li>데이터 백업/복원</li>
+                    <li>광고 없음</li>
+                    <li>평생 무료 업데이트</li>
+                    <li>우선 고객 지원</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="status"></div>
+        
+        <button onclick="upgradeToLifetime()" class="success">⭐ Lifetime Pro로 업그레이드</button>
+        <button onclick="upgradeToAdmin()" class="warning">👑 관리자 권한으로 업그레이드</button>
+        <button onclick="goToMain()" class="info">메인 페이지로 이동</button>
+        
+        <div class="current-user">
+            <h3>업그레이드 후 혜택</h3>
+            <ul>
+                <li>모든 기능을 평생 무제한 사용</li>
+                <li>월 구독료 없음 - 한 번만 결제</li>
+                <li>최신 기능을 무료로 받을 수 있음</li>
+                <li>우선 고객 지원 서비스</li>
+                <li>데이터 백업 및 복원 기능</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function showStatus(message, type = 'success') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+        
+        function displayCurrentUser() {
+            try {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                const userInfoDiv = document.getElementById('userInfo');
+                
+                if (currentUser.email) {
+                    userInfoDiv.innerHTML = `
+                        <strong>이메일:</strong> ${currentUser.email}<br>
+                        <strong>이름:</strong> ${currentUser.name || 'N/A'}<br>
+                        <strong>현재 플랜:</strong> ${currentUser.plan || 'free'}<br>
+                        <strong>가입일:</strong> ${currentUser.createdAt ? new Date(currentUser.createdAt).toLocaleDateString() : 'N/A'}
+                    `;
+                } else {
+                    userInfoDiv.innerHTML = '로그인되지 않았습니다.';
+                }
+            } catch (error) {
+                document.getElementById('userInfo').innerHTML = '사용자 정보를 불러올 수 없습니다.';
+            }
+        }
+        
+        function upgradeToLifetime() {
+            try {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                
+                if (!currentUser.email) {
+                    showStatus('❌ 먼저 로그인해주세요.', 'error');
+                    return;
+                }
+                
+                // Lifetime Pro 플랜으로 업그레이드
+                currentUser.plan = 'lifetime';
+                currentUser.planActivatedAt = new Date().toISOString();
+                currentUser.planType = 'Lifetime Pro';
+                
+                // 로컬 스토리지 업데이트
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                // 사용자 목록도 업데이트
+                const users = JSON.parse(localStorage.getItem('users') || '{}');
+                if (users[currentUser.email]) {
+                    users[currentUser.email] = currentUser;
+                    localStorage.setItem('users', JSON.stringify(users));
+                }
+                
+                showStatus('✅ Lifetime Pro 플랜으로 성공적으로 업그레이드되었습니다!', 'success');
+                
+                // 3초 후 메인 페이지로 이동
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 3000);
+                
+            } catch (error) {
+                showStatus(`❌ 업그레이드 중 오류가 발생했습니다: ${error.message}`, 'error');
+            }
+        }
+        
+        function upgradeToAdmin() {
+            try {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                
+                if (!currentUser.email) {
+                    showStatus('❌ 먼저 로그인해주세요.', 'error');
+                    return;
+                }
+                
+                // 관리자 권한으로 업그레이드
+                currentUser.plan = 'admin';
+                currentUser.role = 'admin';
+                currentUser.planActivatedAt = new Date().toISOString();
+                currentUser.planType = 'Admin';
+                
+                // 로컬 스토리지 업데이트
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                // 사용자 목록도 업데이트
+                const users = JSON.parse(localStorage.getItem('users') || '{}');
+                if (users[currentUser.email]) {
+                    users[currentUser.email] = currentUser;
+                    localStorage.setItem('users', JSON.stringify(users));
+                }
+                
+                showStatus('👑 관리자 권한으로 성공적으로 업그레이드되었습니다!', 'success');
+                
+                // 3초 후 메인 페이지로 이동
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 3000);
+                
+            } catch (error) {
+                showStatus(`❌ 업그레이드 중 오류가 발생했습니다: ${error.message}`, 'error');
+            }
+        }
+        
+        function goToMain() {
+            window.location.href = 'index.html';
+        }
+        
+        // 페이지 로드 시 현재 사용자 정보 표시
+        window.onload = function() {
+            displayCurrentUser();
+        };
+    </script>
+</body>
+</html> 
