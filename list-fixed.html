@@ -910,6 +910,24 @@
         window.onload = function() {
             loadAnimals();
         };
+
+        // 이미지 표시 함수 수정
+        function displayAnimalImage(animal) {
+            if (animal.image) {
+                // 동기화된 이미지에서 찾기
+                if (window.imageSync) {
+                    const allImages = window.imageSync.getAllImages();
+                    for (const [imageId, imageData] of Object.entries(allImages)) {
+                        if (imageData.fileName && animal.image.includes(imageData.fileName)) {
+                            return imageData.data;
+                        }
+                    }
+                }
+                return animal.image;
+            }
+            return 'https://via.placeholder.com/150x150?text=No+Image';
+        }
     </script>
+    <script src="image-sync.js"></script>
 </body>
 </html> 

@@ -861,6 +861,34 @@
         window.onload = function() {
             loadParentFromURL();
         };
+
+        // 이미지 동기화 처리
+        function handleImageUpload(file) {
+            if (window.imageSync) {
+                window.imageSync.handleImageUpload(file);
+            }
+        }
+
+        // 이미지 미리보기 함수 수정
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                
+                // 이미지 동기화 처리
+                handleImageUpload(file);
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagePreview');
+                    if (preview) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
     </script>
+    <script src="image-sync.js"></script>
 </body>
 </html> 
