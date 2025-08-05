@@ -1,248 +1,344 @@
 // 실시간 동기화 시스템
 class RealTimeSync {
     constructor() {
-        this.syncInterval = 3000; // 3초마다 동기화
-        this.lastSync = null;
+        this.syncInterval = null;
+        this.lastSyncTime = Date.now();
         this.isOnline = navigator.onLine;
-        this.syncQueue = [];
-        this.setupEventListeners();
-        this.startRealTimeSync();
+        this.syncStatus = 'idle';
+        
+        this.init();
     }
 
-    // 이벤트 리스너 설정
-    setupEventListeners() {
+    init() {
+        console.log('🔄 실시간 동기화 시스템 시작');
+        
         // 온라인/오프라인 상태 감지
         window.addEventListener('online', () => {
             this.isOnline = true;
-            this.syncAllData();
-            this.showNotification('온라인 상태로 복구되었습니다. 동기화를 시작합니다.');
+            this.syncData();
+            this.showNotification('온라인 상태로 복구되었습니다', 'success');
         });
 
         window.addEventListener('offline', () => {
             this.isOnline = false;
-            this.showNotification('오프라인 상태입니다. 데이터는 로컬에 저장됩니다.');
+            this.showNotification('오프라인 상태입니다. 로컬에서 계속 사용 가능합니다', 'warning');
         });
 
-        // 로컬 스토리지 변경 감지
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'animals' || e.key === 'hatchings' || e.key === 'currentUser') {
-                this.handleDataChange(e.key, e.newValue);
-            }
-        });
-
-        // 페이지 포커스 시 동기화
-        window.addEventListener('focus', () => {
-            this.syncAllData();
-        });
-
-        // 페이지 언로드 시 동기화
-        window.addEventListener('beforeunload', () => {
-            this.syncAllData();
-        });
+        // 실시간 동기화 시작
+        this.startRealTimeSync();
+        
+        // 페이지 로드 시 동기화
+        this.syncData();
     }
 
-    // 실시간 동기화 시작
     startRealTimeSync() {
-        setInterval(() => {
-            if (this.isOnline) {
-                this.syncAllData();
-            }
-        }, this.syncInterval);
+        // 5초마다 자동 동기화
+        this.syncInterval = setInterval(() => {
+            this.syncData();
+        }, 5000);
+
+        // 브라우저 탭 간 통신
+        this.setupCrossTabCommunication();
+        
+        // 로컬 스토리지 변경 감지
+        this.setupStorageListener();
     }
 
-    // 모든 데이터 동기화
-    async syncAllData() {
-        try {
-            const animals = localStorage.getItem('animals');
-            const hatchings = localStorage.getItem('hatchings');
-            const currentUser = localStorage.getItem('currentUser');
-            const lastSync = this.lastSync;
-
-            // 동기화 데이터 준비
-            const syncData = {
-                animals: animals ? JSON.parse(animals) : [],
-                hatchings: hatchings ? JSON.parse(hatchings) : [],
-                currentUser: currentUser ? JSON.parse(currentUser) : {},
-                lastSync: lastSync,
-                timestamp: new Date().toISOString(),
-                deviceInfo: this.getDeviceInfo()
+    setupCrossTabCommunication() {
+        // BroadcastChannel API 사용 (모던 브라우저)
+        if ('BroadcastChannel' in window) {
+            this.broadcastChannel = new BroadcastChannel('gecko-sync');
+            this.broadcastChannel.onmessage = (event) => {
+                if (event.data.type === 'data-updated') {
+                    this.handleDataUpdate(event.data);
+                }
             };
-
-            // 로컬 스토리지에 동기화 상태 저장
-            localStorage.setItem('lastSyncData', JSON.stringify(syncData));
-            this.updateLastSync();
-            
-            console.log('🔄 실시간 동기화 완료');
-            this.updateUI();
-            
-        } catch (error) {
-            console.error('동기화 오류:', error);
-            this.showNotification('동기화 중 오류가 발생했습니다.');
         }
+
+        // localStorage 이벤트 리스너 (레거시 브라우저 지원)
+        window.addEventListener('storage', (event) => {
+            if (event.key && event.key.startsWith('animals') || event.key.startsWith('hatchings')) {
+                this.handleDataUpdate({
+                    type: 'data-updated',
+                    key: event.key,
+                    newValue: event.newValue
+                });
+            }
+        });
     }
 
-    // 데이터 변경 처리
-    handleDataChange(key, newValue) {
-        console.log(`데이터 변경 감지: ${key}`);
+    setupStorageListener() {
+        // 로컬 스토리지 변경 감지를 위한 프록시
+        const originalSetItem = localStorage.setItem;
+        const originalRemoveItem = localStorage.removeItem;
+
+        localStorage.setItem = (key, value) => {
+            originalSetItem.call(localStorage, key, value);
+            this.broadcastDataUpdate(key, value);
+        };
+
+        localStorage.removeItem = (key) => {
+            originalRemoveItem.call(localStorage, key);
+            this.broadcastDataUpdate(key, null);
+        };
+    }
+
+    broadcastDataUpdate(key, value) {
+        const updateData = {
+            type: 'data-updated',
+            key: key,
+            value: value,
+            timestamp: Date.now()
+        };
+
+        // BroadcastChannel로 전송
+        if (this.broadcastChannel) {
+            this.broadcastChannel.postMessage(updateData);
+        }
+
+        // 커스텀 이벤트로 전송
+        window.dispatchEvent(new CustomEvent('data-sync', {
+            detail: updateData
+        }));
+    }
+
+    handleDataUpdate(data) {
+        console.log('🔄 데이터 업데이트 감지:', data);
         
         // UI 업데이트
         this.updateUI();
         
-        // 즉시 동기화
-        this.syncAllData();
-        
-        // 알림 표시
-        this.showNotification('데이터가 업데이트되었습니다');
+        // 동기화 상태 표시
+        this.showSyncStatus('동기화 완료');
     }
 
-    // UI 업데이트
+    syncData() {
+        if (!this.isOnline) {
+            console.log('📱 오프라인 모드 - 로컬 동기화만 수행');
+            return;
+        }
+
+        this.syncStatus = 'syncing';
+        this.showSyncStatus('동기화 중...');
+
+        try {
+            // 동물 데이터 동기화
+            this.syncAnimals();
+            
+            // 해칭 데이터 동기화
+            this.syncHatchings();
+            
+            // 이미지 데이터 동기화
+            this.syncImages();
+            
+            this.lastSyncTime = Date.now();
+            this.syncStatus = 'synced';
+            this.showSyncStatus('동기화 완료');
+            
+        } catch (error) {
+            console.error('❌ 동기화 오류:', error);
+            this.syncStatus = 'error';
+            this.showSyncStatus('동기화 오류');
+        }
+    }
+
+    syncAnimals() {
+        const animals = JSON.parse(localStorage.getItem('animals') || '[]');
+        const lastSync = localStorage.getItem('animals_last_sync') || '0';
+        
+        // 변경된 데이터만 동기화
+        const updatedAnimals = animals.filter(animal => 
+            animal.lastModified > parseInt(lastSync)
+        );
+        
+        if (updatedAnimals.length > 0) {
+            console.log(`🦎 ${updatedAnimals.length}개 개체 동기화`);
+            localStorage.setItem('animals_last_sync', Date.now().toString());
+        }
+    }
+
+    syncHatchings() {
+        const hatchings = JSON.parse(localStorage.getItem('hatchings') || '[]');
+        const lastSync = localStorage.getItem('hatchings_last_sync') || '0';
+        
+        const updatedHatchings = hatchings.filter(hatching => 
+            hatching.lastModified > parseInt(lastSync)
+        );
+        
+        if (updatedHatchings.length > 0) {
+            console.log(`🥚 ${updatedHatchings.length}개 해칭 동기화`);
+            localStorage.setItem('hatchings_last_sync', Date.now().toString());
+        }
+    }
+
+    syncImages() {
+        const images = JSON.parse(localStorage.getItem('images') || '[]');
+        const lastSync = localStorage.getItem('images_last_sync') || '0';
+        
+        const updatedImages = images.filter(image => 
+            image.lastModified > parseInt(lastSync)
+        );
+        
+        if (updatedImages.length > 0) {
+            console.log(`📸 ${updatedImages.length}개 이미지 동기화`);
+            localStorage.setItem('images_last_sync', Date.now().toString());
+        }
+    }
+
     updateUI() {
         // 통계 업데이트
-        const animals = JSON.parse(localStorage.getItem('animals') || '[]');
-        const hatchings = JSON.parse(localStorage.getItem('hatchings') || '[]');
+        this.updateStats();
         
-        const totalAnimalsEl = document.getElementById('totalAnimals');
-        const totalGenerationsEl = document.getElementById('totalGenerations');
-        
-        if (totalAnimalsEl) {
-            totalAnimalsEl.textContent = animals.length;
-        }
-        
-        if (totalGenerationsEl) {
-            totalGenerationsEl.textContent = animals.length > 0 ? '5' : '0';
-        }
-
-        // 동기화 상태 표시
-        this.updateSyncStatus();
+        // 목록 새로고침
+        this.refreshLists();
     }
 
-    // 동기화 상태 업데이트
-    updateSyncStatus() {
-        const syncStatusEl = document.querySelector('.sync-status');
-        if (syncStatusEl) {
-            const status = this.getSyncStatus();
-            syncStatusEl.innerHTML = `
-                <div class="sync-indicator ${status.isOnline ? 'online' : 'offline'}"></div>
-                <span>${status.isOnline ? '동기화됨' : '오프라인'}</span>
+    updateStats() {
+        try {
+            const animals = JSON.parse(localStorage.getItem('animals') || '[]');
+            const hatchings = JSON.parse(localStorage.getItem('hatchings') || '[]');
+            
+            // 통계 요소 업데이트
+            const totalAnimalsElement = document.getElementById('totalAnimals');
+            const totalHatchingsElement = document.getElementById('totalHatchings');
+            
+            if (totalAnimalsElement) {
+                totalAnimalsElement.textContent = animals.length;
+            }
+            if (totalHatchingsElement) {
+                totalHatchingsElement.textContent = hatchings.length;
+            }
+        } catch (error) {
+            console.error('통계 업데이트 오류:', error);
+        }
+    }
+
+    refreshLists() {
+        // 동물 목록 새로고침
+        if (typeof window.refreshAnimals === 'function') {
+            window.refreshAnimals();
+        }
+        
+        // 해칭 목록 새로고침
+        if (typeof window.refreshHatchings === 'function') {
+            window.refreshHatchings();
+        }
+    }
+
+    showSyncStatus(message) {
+        // 상태 표시 요소 찾기
+        let statusElement = document.getElementById('sync-status');
+        
+        if (!statusElement) {
+            statusElement = document.createElement('div');
+            statusElement.id = 'sync-status';
+            statusElement.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #03c75a;
+                color: white;
+                padding: 10px 15px;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 600;
+                z-index: 10000;
+                opacity: 0;
+                transform: translateX(100%);
+                transition: all 0.3s ease;
             `;
+            document.body.appendChild(statusElement);
         }
-    }
-
-    // 마지막 동기화 시간 업데이트
-    updateLastSync() {
-        this.lastSync = new Date();
-        localStorage.setItem('lastSync', this.lastSync.toISOString());
-    }
-
-    // 알림 표시
-    showNotification(message) {
-        const notification = document.createElement('div');
-        notification.className = 'sync-notification';
-        notification.innerHTML = `
-            <i class="fas fa-sync-alt"></i>
-            <span>${message}</span>
-        `;
-        document.body.appendChild(notification);
         
+        statusElement.textContent = message;
+        statusElement.style.opacity = '1';
+        statusElement.style.transform = 'translateX(0)';
+        
+        // 3초 후 숨기기
         setTimeout(() => {
-            notification.remove();
+            statusElement.style.opacity = '0';
+            statusElement.style.transform = 'translateX(100%)';
         }, 3000);
     }
 
-    // 디바이스 정보 가져오기
-    getDeviceInfo() {
-        return {
-            userAgent: navigator.userAgent,
-            screenWidth: window.screen.width,
-            screenHeight: window.screen.height,
-            viewportWidth: window.innerWidth,
-            viewportHeight: window.innerHeight,
-            platform: navigator.platform,
-            language: navigator.language,
-            timestamp: new Date().toISOString()
-        };
+    showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: ${type === 'success' ? '#03c75a' : type === 'warning' ? '#f59e0b' : '#ef4444'};
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            z-index: 10001;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        `;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        // 애니메이션
+        setTimeout(() => {
+            notification.style.opacity = '1';
+            notification.style.transform = 'translateX(-50%) translateY(0)';
+        }, 100);
+        
+        // 5초 후 제거
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateX(-50%) translateY(-20px)';
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 300);
+        }, 5000);
+    }
+
+    // 수동 동기화
+    manualSync() {
+        this.syncData();
+        this.showNotification('수동 동기화를 시작했습니다', 'info');
     }
 
     // 동기화 상태 확인
     getSyncStatus() {
         return {
+            status: this.syncStatus,
+            lastSync: this.lastSyncTime,
             isOnline: this.isOnline,
-            lastSync: this.lastSync,
-            totalAnimals: JSON.parse(localStorage.getItem('animals') || '[]').length,
-            totalHatchings: JSON.parse(localStorage.getItem('hatchings') || '[]').length,
-            deviceInfo: this.getDeviceInfo()
+            timestamp: Date.now()
         };
     }
 
-    // 데이터 내보내기 (백업)
-    exportData() {
-        const data = {
-            animals: JSON.parse(localStorage.getItem('animals') || '[]'),
-            hatchings: JSON.parse(localStorage.getItem('hatchings') || '[]'),
-            currentUser: JSON.parse(localStorage.getItem('currentUser') || '{}'),
-            lastSync: this.lastSync,
-            exportDate: new Date().toISOString(),
-            deviceInfo: this.getDeviceInfo()
-        };
-
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `gecko-data-${new Date().toISOString().split('T')[0]}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        
-        this.showNotification('데이터 백업이 완료되었습니다');
+    // 동기화 중지
+    stopSync() {
+        if (this.syncInterval) {
+            clearInterval(this.syncInterval);
+            this.syncInterval = null;
+        }
+        console.log('🛑 실시간 동기화 중지');
     }
 
-    // 데이터 가져오기 (복원)
-    importData(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    
-                    if (data.animals) localStorage.setItem('animals', JSON.stringify(data.animals));
-                    if (data.hatchings) localStorage.setItem('hatchings', JSON.stringify(data.hatchings));
-                    if (data.currentUser) localStorage.setItem('currentUser', JSON.stringify(data.currentUser));
-                    
-                    this.updateUI();
-                    this.syncAllData();
-                    this.showNotification('데이터를 성공적으로 복원했습니다');
-                    resolve(data);
-                } catch (error) {
-                    reject(error);
-                }
-            };
-            reader.readAsText(file);
-        });
-    }
-
-    // 동기화 히스토리 확인
-    getSyncHistory() {
-        const history = [];
-        const keys = Object.keys(localStorage);
-        
-        keys.forEach(key => {
-            if (key.includes('Sync') || key.includes('sync')) {
-                try {
-                    const data = JSON.parse(localStorage.getItem(key));
-                    history.push({
-                        key: key,
-                        data: data,
-                        timestamp: data.timestamp || new Date().toISOString()
-                    });
-                } catch (e) {
-                    // JSON 파싱 실패 시 무시
-                }
-            }
-        });
-        
-        return history.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    // 동기화 재시작
+    restartSync() {
+        this.stopSync();
+        this.startRealTimeSync();
+        console.log('🔄 실시간 동기화 재시작');
     }
 }
 
 // 전역 인스턴스 생성
-window.realTimeSync = new RealTimeSync(); 
+window.realTimeSync = new RealTimeSync();
+
+// 수동 동기화 함수 (전역에서 사용 가능)
+window.manualSync = () => {
+    window.realTimeSync.manualSync();
+};
+
+console.log('✅ 실시간 동기화 시스템 로드 완료'); 

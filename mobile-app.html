@@ -18,8 +18,8 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #ffffff;
+            color: #333;
             overflow-x: hidden;
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
@@ -34,7 +34,7 @@
 
         /* 앱 헤더 */
         .app-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #03c75a;
             color: white;
             padding: 15px 20px;
             position: sticky;
@@ -115,25 +115,24 @@
         }
 
         .stat-card {
-            background: rgba(255, 255, 255, 0.1);
+            background: #ffffff;
             border-radius: 16px;
             padding: 16px;
             text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
         }
 
         .stat-number {
             font-size: 1.8rem;
             font-weight: 800;
-            color: white;
+            color: #03c75a;
             margin-bottom: 6px;
         }
 
         .stat-label {
             font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.8);
+            color: #666;
             font-weight: 500;
         }
 
@@ -145,12 +144,12 @@
         }
 
         .menu-item {
-            background: rgba(255, 255, 255, 0.1);
+            background: #ffffff;
             border-radius: 16px;
             padding: 20px 16px;
             text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             min-height: 100px;
@@ -161,7 +160,6 @@
             touch-action: manipulation;
             position: relative;
             overflow: hidden;
-            backdrop-filter: blur(10px);
         }
 
         .menu-item:active {
@@ -481,6 +479,7 @@
         </div>
     </div>
 
+    <script src="real-time-sync.js"></script>
     <script src="auto-firebase-setup.js"></script>
     <script src="server-sync.js"></script>
     <script src="image-sync.js"></script>
