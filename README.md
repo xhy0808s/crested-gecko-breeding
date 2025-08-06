@@ -1,38 +1,40 @@
-# 🦎 최민석 (Chogang) - 크레스티드 게코 브리딩 전문가
+# Hi there 👋
 
-<div align="center">
-  <img src="https://img.shields.io/badge/🦎-크레스티드게코-03c75a?style=for-the-badge&logo=reptile" alt="Crested Gecko" />
-  <img src="https://img.shields.io/badge/🌐-웹개발자-03c75a?style=for-the-badge&logo=javascript" alt="Web Developer" />
-  <img src="https://img.shields.io/badge/📱-모바일앱-03c75a?style=for-the-badge&logo=react" alt="Mobile App" />
-</div>
+## About me 😊
+
+✨ **Hey, 저는 파충류 번식 전문가입니다.** ✨
+
+**크레스티드 게코 브리딩**을 위한 **디지털 관리 시스템**을 개발하는 주니어 개발자입니다!
+
+### 🦎 **전문 분야**
+- **파충류 번식 시스템** 개발
+- **크레스티드 게코 브리딩** 전문
+- **유전학적 모프 계산** 시스템
+- **실시간 데이터 동기화** 기술
 
 ---
 
-## 👨‍💻 **About Me**
+## 📚 Tech Stack 📚
 
-안녕하세요! 저는 **크레스티드 게코 브리딩 전문가**이자 **웹 개발자**입니다.
+### ✨ **Platforms & Languages** ✨
 
-### 🎯 **전문 분야**
-- **크레스티드 게코 브리딩 시스템 개발**
-- **웹 애플리케이션 및 모바일 앱 개발**
-- **실시간 데이터 동기화 시스템**
-- **Firebase 기반 클라우드 서비스**
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+![PWA](https://img.shields.io/badge/PWA-5A0FC8?style=for-the-badge&logo=pwa&logoColor=white)
 
-### 🛠️ **기술 스택**
-```
-💻 Frontend: HTML5, CSS3, JavaScript, React
-📱 Mobile: Progressive Web App (PWA)
-🔥 Backend: Firebase Firestore, Authentication
-🔄 Real-time: WebSocket, BroadcastChannel API
-🎨 UI/UX: Modern Design, Responsive Layout
-```
+### 🛠️ **Tools** 🛠️
+
+[![Visual Studio Code](https://img.shields.io/badge/Visual_Studio_Code-007ACC?style=for-the-badge&logo=visual-studio-code&logoColor=white)](https://code.visualstudio.com/)
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/xhy0808s)
 
 ---
 
 ## 🦎 **주요 프로젝트**
 
 ### 🚀 **크레스티드 게코 브리딩 관리 시스템**
-> **개인 브리딩을 위한 완벽한 솔루션**
+> **파충류 번식을 위한 완벽한 디지털 솔루션**
 
 **주요 기능:**
 - ✅ **개체 등록 및 관리** (F1~F5 세대)
@@ -45,7 +47,7 @@
 **기술적 특징:**
 - 🔄 **실시간 동기화**: Firebase Firestore 기반
 - 📱 **모바일 최적화**: PWA 지원
-- �� **현대적 UI/UX**: 네이버 스타일 디자인
+- 🎨 **현대적 UI/UX**: 네이버 스타일 디자인
 - 🔒 **데이터 안전성**: 클라우드 백업
 - ⚡ **오프라인 지원**: 로컬 저장소
 
@@ -66,10 +68,10 @@
 
 ## 🎯 **개발 철학**
 
-> **"개인 브리딩을 위한 완벽한 디지털 솔루션"**
+> **"파충류 번식의 디지털 혁신을 이끌어가는 개발자"**
 
 ### 💡 **핵심 가치**
-- **사용자 중심**: 개인 브리더의 실제 니즈 반영
+- **사용자 중심**: 파충류 브리더의 실제 니즈 반영
 - **실용성**: 복잡하지 않고 직관적인 인터페이스
 - **안정성**: 데이터 손실 없는 안전한 시스템
 - **확장성**: 새로운 기능 추가가 용이한 구조
@@ -114,4 +116,4 @@
 
 ---
 
-> **"개인 브리딩의 디지털 혁신을 이끌어가는 개발자"** 🦎✨ 
+> **"파충류 번식의 디지털 혁신을 이끌어가는 개발자"** 🦎✨ 

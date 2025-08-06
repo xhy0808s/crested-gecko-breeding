@@ -1,20 +1,289 @@
 // Firebase 실시간 동기화 시스템
-// PC와 모바일 간 실시간 데이터 동기화
-
 class FirebaseSync {
     constructor() {
-        this.db = null;
-        this.auth = null;
-        this.userId = null;
-        this.syncInterval = null;
         this.isOnline = navigator.onLine;
-        this.deviceId = this.generateDeviceId();
+        this.syncQueue = [];
+        this.isInitialized = false;
+        
+        // 온라인/오프라인 상태 감지
+        window.addEventListener('online', () => {
+            this.isOnline = true;
+            console.log('🌐 온라인 상태로 변경됨');
+            this.processSyncQueue();
+        });
+        
+        window.addEventListener('offline', () => {
+            this.isOnline = false;
+            console.log('📴 오프라인 상태로 변경됨');
+        });
         
         this.init();
     }
-
-    // 디바이스 ID 생성
-    generateDeviceId() {
+    
+    async init() {
+        try {
+            // Firebase가 로드될 때까지 대기
+            await this.waitForFirebase();
+            
+            // 실시간 리스너 설정
+            this.setupRealtimeListeners();
+            
+            // 초기 데이터 동기화
+            await this.initialSync();
+            
+            this.isInitialized = true;
+            console.log('🚀 Firebase 동기화 시스템 초기화 완료');
+            
+            // 동기화 상태를 UI에 표시
+            this.updateSyncStatus('synchronized');
+            
+        } catch (error) {
+            console.error('❌ Firebase 동기화 초기화 실패:', error);
+            this.updateSyncStatus('error');
+        }
+    }
+    
+    async waitForFirebase() {
+        return new Promise((resolve) => {
+            if (window.db && window.storage && window.currentUserId && window.firebaseImports) {
+                resolve();
+            } else {
+                // firebaseReady 이벤트를 기다림
+                window.addEventListener('firebaseReady', () => {
+                    setTimeout(resolve, 100); // 약간의 지연을 두어 안정성 확보
+                }, { once: true });
+                
+                // 타임아웃 설정 (10초 후 실패)
+                setTimeout(() => {
+                    console.warn('Firebase 초기화 타임아웃 - 오프라인 모드로 전환');
+                    resolve();
+                }, 10000);
+            }
+        });
+    }
+    
+    // 실시간 리스너 설정
+    setupRealtimeListeners() {
+        const { onSnapshot, doc, collection } = window.firebaseImports || {};
+        if (!onSnapshot) return;
+        
+        // 개체 데이터 실시간 리스너
+        const animalsRef = doc(window.db, 'users', window.currentUserId, 'data', 'animals');
+        onSnapshot(animalsRef, (doc) => {
+            if (doc.exists()) {
+                const cloudData = doc.data().animals || [];
+                this.mergeCloudDataToLocal('geckoBreedingData', cloudData);
+                console.log('🔄 개체 데이터 실시간 업데이트');
+            }
+        });
+        
+        // 베이비 데이터 실시간 리스너
+        const babiesRef = doc(window.db, 'users', window.currentUserId, 'data', 'babies');
+        onSnapshot(babiesRef, (doc) => {
+            if (doc.exists()) {
+                const cloudData = doc.data().babies || [];
+                this.mergeCloudDataToLocal('babies', cloudData);
+                console.log('🔄 베이비 데이터 실시간 업데이트');
+            }
+        });
+    }
+    
+    // 초기 데이터 동기화
+    async initialSync() {
+        try {
+            await this.downloadFromCloud();
+            await this.uploadToCloud();
+        } catch (error) {
+            console.error('초기 동기화 실패:', error);
+        }
+    }
+    
+    // 클라우드에서 데이터 다운로드
+    async downloadFromCloud() {
+        try {
+            const { doc, getDoc } = window.firebaseImports || {};
+            if (!getDoc) return;
+            
+            // 개체 데이터 다운로드
+            const animalsRef = doc(window.db, 'users', window.currentUserId, 'data', 'animals');
+            const animalsSnap = await getDoc(animalsRef);
+            
+            if (animalsSnap.exists()) {
+                const cloudAnimals = animalsSnap.data().animals || [];
+                this.mergeCloudDataToLocal('geckoBreedingData', cloudAnimals);
+            }
+            
+            // 베이비 데이터 다운로드
+            const babiesRef = doc(window.db, 'users', window.currentUserId, 'data', 'babies');
+            const babiesSnap = await getDoc(babiesRef);
+            
+            if (babiesSnap.exists()) {
+                const cloudBabies = babiesSnap.data().babies || [];
+                this.mergeCloudDataToLocal('babies', cloudBabies);
+            }
+            
+            console.log('☁️ 클라우드 데이터 다운로드 완료');
+            
+        } catch (error) {
+            console.error('클라우드 다운로드 실패:', error);
+        }
+    }
+    
+    // 클라우드에 데이터 업로드
+    async uploadToCloud() {
+        try {
+            const animals = JSON.parse(localStorage.getItem('geckoBreedingData') || '[]');
+            const babies = JSON.parse(localStorage.getItem('babies') || '[]');
+            
+            await this.saveToCloud('animals', animals);
+            await this.saveToCloud('babies', babies);
+            
+            console.log('☁️ 클라우드 업로드 완료');
+            
+        } catch (error) {
+            console.error('클라우드 업로드 실패:', error);
+        }
+    }
+    
+    // 클라우드 데이터를 로컬과 병합
+    mergeCloudDataToLocal(key, cloudData) {
+        try {
+            const localData = JSON.parse(localStorage.getItem(key) || '[]');
+            const mergedData = this.mergeArrays(localData, cloudData);
+            
+            localStorage.setItem(key, JSON.stringify(mergedData));
+            
+            // UI 업데이트
+            if (key === 'geckoBreedingData' && window.updateStatistics) {
+                window.updateStatistics();
+                if (document.getElementById('animalListContainer')) {
+                    window.loadAnimalList();
+                }
+            } else if (key === 'babies' && window.updateStatistics) {
+                window.updateStatistics();
+                if (document.getElementById('babyListContainer')) {
+                    window.loadBabyList();
+                }
+            }
+            
+        } catch (error) {
+            console.error('데이터 병합 실패:', error);
+        }
+    }
+    
+    // 배열 데이터 병합 (중복 제거)
+    mergeArrays(localArray, cloudArray) {
+        const merged = [...localArray];
+        
+        cloudArray.forEach(cloudItem => {
+            const existingIndex = merged.findIndex(localItem => 
+                localItem.id === cloudItem.id
+            );
+            
+            if (existingIndex >= 0) {
+                // 더 최신 데이터로 업데이트
+                const localUpdated = new Date(merged[existingIndex].updatedAt || merged[existingIndex].createdAt);
+                const cloudUpdated = new Date(cloudItem.updatedAt || cloudItem.createdAt);
+                
+                if (cloudUpdated > localUpdated) {
+                    merged[existingIndex] = cloudItem;
+                }
+            } else {
+                merged.push(cloudItem);
+            }
+        });
+        
+        return merged;
+    }
+    
+    // 데이터를 클라우드에 저장
+    async saveToCloud(dataType, data) {
+        try {
+            if (!this.isOnline) {
+                this.addToSyncQueue(dataType, data);
+                return;
+            }
+            
+            const { doc, setDoc } = window.firebaseImports || {};
+            if (!setDoc) return;
+            
+            const docRef = doc(window.db, 'users', window.currentUserId, 'data', dataType);
+            await setDoc(docRef, {
+                [dataType]: data,
+                lastUpdated: new Date().toISOString(),
+                deviceId: this.getDeviceId()
+            }, { merge: true });
+            
+            console.log(`☁️ ${dataType} 클라우드 저장 완료`);
+            this.updateSyncStatus('synchronized');
+            
+        } catch (error) {
+            console.error(`클라우드 저장 실패 (${dataType}):`, error);
+            this.addToSyncQueue(dataType, data);
+            this.updateSyncStatus('error');
+        }
+    }
+    
+    // 이미지를 클라우드에 업로드
+    async uploadImage(file, path) {
+        try {
+            if (!this.isOnline) {
+                throw new Error('오프라인 상태에서는 이미지 업로드가 불가능합니다.');
+            }
+            
+            const { ref, uploadBytes, getDownloadURL } = window.firebaseImports || {};
+            if (!uploadBytes) throw new Error('Firebase Storage를 사용할 수 없습니다.');
+            
+            const imageRef = ref(window.storage, `images/${window.currentUserId}/${path}`);
+            const snapshot = await uploadBytes(imageRef, file);
+            const downloadURL = await getDownloadURL(snapshot.ref);
+            
+            console.log('🖼️ 이미지 업로드 완료:', downloadURL);
+            return downloadURL;
+            
+        } catch (error) {
+            console.error('이미지 업로드 실패:', error);
+            throw error;
+        }
+    }
+    
+    // 동기화 큐에 추가 (오프라인 시)
+    addToSyncQueue(dataType, data) {
+        this.syncQueue.push({
+            dataType,
+            data,
+            timestamp: Date.now()
+        });
+        
+        console.log(`📝 동기화 큐에 추가: ${dataType}`);
+        this.updateSyncStatus('pending');
+    }
+    
+    // 동기화 큐 처리
+    async processSyncQueue() {
+        if (!this.isOnline || this.syncQueue.length === 0) return;
+        
+        console.log(`🔄 동기화 큐 처리 시작 (${this.syncQueue.length}개 항목)`);
+        
+        const queue = [...this.syncQueue];
+        this.syncQueue = [];
+        
+        for (const item of queue) {
+            try {
+                await this.saveToCloud(item.dataType, item.data);
+            } catch (error) {
+                console.error('큐 처리 실패:', error);
+                this.syncQueue.push(item); // 실패한 항목 다시 큐에 추가
+            }
+        }
+        
+        if (this.syncQueue.length === 0) {
+            this.updateSyncStatus('synchronized');
+        }
+    }
+    
+    // 기기 ID 생성
+    getDeviceId() {
         let deviceId = localStorage.getItem('deviceId');
         if (!deviceId) {
             deviceId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -22,362 +291,64 @@ class FirebaseSync {
         }
         return deviceId;
     }
-
-    // Firebase 초기화
-    async init() {
-        try {
-            // Firebase SDK 로드
-            await this.loadFirebaseSDK();
-            
-            // Firebase 설정
-            const firebaseConfig = {
-                apiKey: "AIzaSyBXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-                authDomain: "crested-gecko-breeding.firebaseapp.com",
-                projectId: "crested-gecko-breeding",
-                storageBucket: "crested-gecko-breeding.appspot.com",
-                messagingSenderId: "123456789012",
-                appId: "1:123456789012:web:abcdefghijklmnop"
-            };
-
-            // Firebase 초기화
-            firebase.initializeApp(firebaseConfig);
-            this.db = firebase.firestore();
-            this.auth = firebase.auth();
-
-            console.log('🔥 Firebase 초기화 완료');
-            
-            // 익명 로그인
-            await this.anonymousLogin();
-            
-            // 실시간 동기화 시작
-            this.startRealTimeSync();
-            
-        } catch (error) {
-            console.error('❌ Firebase 초기화 오류:', error);
-            // Firebase 실패 시 로컬 동기화로 폴백
-            this.fallbackToLocalSync();
-        }
-    }
-
-    // Firebase SDK 로드
-    async loadFirebaseSDK() {
-        return new Promise((resolve, reject) => {
-            // Firebase SDK가 이미 로드되어 있는지 확인
-            if (window.firebase) {
-                resolve();
-                return;
-            }
-
-            // Firebase SDK 로드
-            const script = document.createElement('script');
-            script.src = 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
-            script.onload = () => {
-                const authScript = document.createElement('script');
-                authScript.src = 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
-                authScript.onload = () => {
-                    const firestoreScript = document.createElement('script');
-                    firestoreScript.src = 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
-                    firestoreScript.onload = resolve;
-                    firestoreScript.onerror = reject;
-                    document.head.appendChild(firestoreScript);
-                };
-                authScript.onerror = reject;
-                document.head.appendChild(authScript);
-            };
-            script.onerror = reject;
-            document.head.appendChild(script);
-        });
-    }
-
-    // 익명 로그인
-    async anonymousLogin() {
-        try {
-            const userCredential = await this.auth.signInAnonymously();
-            this.userId = userCredential.user.uid;
-            console.log('👤 익명 로그인 완료:', this.userId);
-        } catch (error) {
-            console.error('❌ 로그인 오류:', error);
-            throw error;
-        }
-    }
-
-    // 실시간 동기화 시작
-    startRealTimeSync() {
-        console.log('🔄 Firebase 실시간 동기화 시작');
+    
+    // 동기화 상태 UI 업데이트
+    updateSyncStatus(status) {
+        const statusElement = document.getElementById('syncStatus');
+        if (!statusElement) return;
         
-        // 실시간 리스너 설정
-        this.setupRealTimeListeners();
+        const statusConfig = {
+            synchronized: { icon: '✅', text: '동기화됨', color: 'text-green-600' },
+            pending: { icon: '⏳', text: '동기화 대기중', color: 'text-yellow-600' },
+            syncing: { icon: '🔄', text: '동기화 중', color: 'text-blue-600' },
+            error: { icon: '❌', text: '동기화 오류', color: 'text-red-600' },
+            offline: { icon: '📴', text: '오프라인', color: 'text-gray-600' }
+        };
         
-        // 주기적 동기화
-        this.syncInterval = setInterval(() => {
-            this.syncToFirebase();
-        }, 3000);
-        
-        // 이벤트 리스너 설정
-        this.setupEventListeners();
-    }
-
-    // 실시간 리스너 설정
-    setupRealTimeListeners() {
-        // 동물 데이터 실시간 리스너
-        this.db.collection('users').doc(this.userId).collection('animals')
-            .onSnapshot((snapshot) => {
-                snapshot.docChanges().forEach((change) => {
-                    if (change.type === 'added' || change.type === 'modified') {
-                        this.handleFirebaseDataChange('animals', change.doc.data());
-                    }
-                });
-            });
-
-        // 해칭 데이터 실시간 리스너
-        this.db.collection('users').doc(this.userId).collection('hatchings')
-            .onSnapshot((snapshot) => {
-                snapshot.docChanges().forEach((change) => {
-                    if (change.type === 'added' || change.type === 'modified') {
-                        this.handleFirebaseDataChange('hatchings', change.doc.data());
-                    }
-                });
-            });
-    }
-
-    // 이벤트 리스너 설정
-    setupEventListeners() {
-        // 온라인/오프라인 상태 감지
-        window.addEventListener('online', () => {
-            this.isOnline = true;
-            this.updateSyncStatus();
-            this.syncToFirebase();
-        });
-
-        window.addEventListener('offline', () => {
-            this.isOnline = false;
-            this.updateSyncStatus();
-        });
-
-        // 로컬 스토리지 변경 감지
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'animals' || e.key === 'hatchings') {
-                this.syncToFirebase();
-            }
-        });
-
-        // 페이지 포커스 시 동기화
-        window.addEventListener('focus', () => {
-            this.syncFromFirebase();
-        });
-    }
-
-    // Firebase로 데이터 동기화
-    async syncToFirebase() {
-        if (!this.isOnline || !this.db) {
-            return;
-        }
-
-        try {
-            const animals = JSON.parse(localStorage.getItem('animals') || '[]');
-            const hatchings = JSON.parse(localStorage.getItem('hatchings') || '[]');
-
-            // 동물 데이터 동기화
-            for (const animal of animals) {
-                await this.db.collection('users').doc(this.userId)
-                    .collection('animals').doc(animal.id).set({
-                        ...animal,
-                        deviceId: this.deviceId,
-                        lastUpdated: new Date().toISOString()
-                    });
-            }
-
-            // 해칭 데이터 동기화
-            for (const hatching of hatchings) {
-                await this.db.collection('users').doc(this.userId)
-                    .collection('hatchings').doc(hatching.id).set({
-                        ...hatching,
-                        deviceId: this.deviceId,
-                        lastUpdated: new Date().toISOString()
-                    });
-            }
-
-            console.log('✅ Firebase 동기화 완료');
-            this.updateLastSync();
-            
-        } catch (error) {
-            console.error('❌ Firebase 동기화 오류:', error);
-        }
-    }
-
-    // Firebase에서 데이터 동기화
-    async syncFromFirebase() {
-        if (!this.isOnline || !this.db) {
-            return;
-        }
-
-        try {
-            // 동물 데이터 가져오기
-            const animalsSnapshot = await this.db.collection('users').doc(this.userId)
-                .collection('animals').get();
-            
-            const animals = [];
-            animalsSnapshot.forEach(doc => {
-                animals.push(doc.data());
-            });
-
-            // 해칭 데이터 가져오기
-            const hatchingsSnapshot = await this.db.collection('users').doc(this.userId)
-                .collection('hatchings').get();
-            
-            const hatchings = [];
-            hatchingsSnapshot.forEach(doc => {
-                hatchings.push(doc.data());
-            });
-
-            // 로컬 스토리지 업데이트
-            localStorage.setItem('animals', JSON.stringify(animals));
-            localStorage.setItem('hatchings', JSON.stringify(hatchings));
-            localStorage.setItem('lastSync', new Date().toISOString());
-
-            console.log('✅ Firebase에서 데이터 동기화 완료');
-            this.updateUI();
-            
-        } catch (error) {
-            console.error('❌ Firebase 데이터 가져오기 오류:', error);
-        }
-    }
-
-    // Firebase 데이터 변경 처리
-    handleFirebaseDataChange(type, data) {
-        console.log(`🔄 Firebase 데이터 변경: ${type}`, data);
-        
-        if (type === 'animals') {
-            const currentAnimals = JSON.parse(localStorage.getItem('animals') || '[]');
-            const existingIndex = currentAnimals.findIndex(a => a.id === data.id);
-            
-            if (existingIndex >= 0) {
-                currentAnimals[existingIndex] = data;
-            } else {
-                currentAnimals.push(data);
-            }
-            
-            localStorage.setItem('animals', JSON.stringify(currentAnimals));
-        } else if (type === 'hatchings') {
-            const currentHatchings = JSON.parse(localStorage.getItem('hatchings') || '[]');
-            const existingIndex = currentHatchings.findIndex(h => h.id === data.id);
-            
-            if (existingIndex >= 0) {
-                currentHatchings[existingIndex] = data;
-            } else {
-                currentHatchings.push(data);
-            }
-            
-            localStorage.setItem('hatchings', JSON.stringify(currentHatchings));
-        }
-        
-        this.updateUI();
-        this.showNotification(`${type} 데이터가 업데이트되었습니다`);
-    }
-
-    // UI 업데이트
-    updateUI() {
-        const animals = JSON.parse(localStorage.getItem('animals') || '[]');
-        const totalAnimalsEl = document.getElementById('totalAnimals');
-        if (totalAnimalsEl) {
-            totalAnimalsEl.textContent = animals.length;
-        }
-
-        const lastSyncEl = document.getElementById('lastSync');
-        if (lastSyncEl) {
-            const lastSync = localStorage.getItem('lastSync');
-            lastSyncEl.textContent = lastSync ? 
-                new Date(lastSync).toLocaleTimeString() : '-';
-        }
-    }
-
-    // 동기화 상태 업데이트
-    updateSyncStatus() {
-        const statusEl = document.getElementById('syncStatus');
-        const stateEl = document.getElementById('syncState');
-        
-        if (statusEl) {
-            statusEl.textContent = this.isOnline ? 'Firebase 실시간 동기화 중...' : '오프라인 모드';
-        }
-        
-        if (stateEl) {
-            stateEl.textContent = this.isOnline ? '온라인' : '오프라인';
-        }
-    }
-
-    // 마지막 동기화 시간 업데이트
-    updateLastSync() {
-        localStorage.setItem('lastSync', new Date().toISOString());
-    }
-
-    // 알림 표시
-    showNotification(message) {
-        const notification = document.createElement('div');
-        notification.className = 'sync-notification';
-        notification.innerHTML = `
-            <i class="fas fa-sync-alt"></i>
-            <span>${message}</span>
+        const config = statusConfig[status] || statusConfig.offline;
+        statusElement.innerHTML = `
+            <span class="${config.color}">
+                ${config.icon} ${config.text}
+            </span>
         `;
-        
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #38a169;
-            color: white;
-            padding: 12px 18px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            animation: slideInRight 0.5s ease-out;
-        `;
-
-        document.body.appendChild(notification);
-
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
     }
-
-    // 로컬 동기화로 폴백
-    fallbackToLocalSync() {
-        console.log('🔄 로컬 동기화로 폴백');
-        
-        // 기존 로컬 동기화 시스템 사용
-        if (typeof window.realTimeSyncV2 !== 'undefined') {
-            window.realTimeSyncV2.startRealTimeSync();
+    
+    // 수동 동기화
+    async manualSync() {
+        try {
+            this.updateSyncStatus('syncing');
+            await this.uploadToCloud();
+            await this.downloadFromCloud();
+            await this.processSyncQueue();
+            console.log('🔄 수동 동기화 완료');
+        } catch (error) {
+            console.error('수동 동기화 실패:', error);
+            this.updateSyncStatus('error');
         }
-    }
-
-    // 강제 동기화
-    forceSync() {
-        console.log('🔄 강제 Firebase 동기화 시작');
-        this.syncToFirebase();
-        this.syncFromFirebase();
-        this.showNotification('강제 동기화가 완료되었습니다');
-    }
-
-    // 동기화 중지
-    stopSync() {
-        if (this.syncInterval) {
-            clearInterval(this.syncInterval);
-            this.syncInterval = null;
-        }
-        console.log('⏹️ Firebase 동기화 중지');
-    }
-
-    // 동기화 재시작
-    restartSync() {
-        this.stopSync();
-        this.startRealTimeSync();
-        console.log('🔄 Firebase 동기화 재시작');
     }
 }
 
-// 전역 인스턴스 생성
-window.firebaseSync = new FirebaseSync();
+// Firebase 동기화 시스템 초기화
+window.addEventListener('firebaseReady', () => {
+    console.log('🔥 Firebase 준비 완료 - 동기화 시스템 초기화 시작');
+    window.firebaseSync = new FirebaseSync();
+});
 
-console.log('✅ Firebase 실시간 동기화 시스템 로드 완료'); 
+// 페이지 로드 시 대기 (Firebase가 아직 준비되지 않은 경우)
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        if (!window.firebaseSync) {
+            console.log('⏳ Firebase 대기 중...');
+            // 최대 5초 더 대기
+            setTimeout(() => {
+                if (!window.firebaseSync && window.db) {
+                    console.log('🔄 지연 초기화 시작');
+                    window.firebaseSync = new FirebaseSync();
+                }
+            }, 5000);
+        }
+    }, 1000);
+});
+
+// 전역 함수로 내보내기
+window.FirebaseSync = FirebaseSync;

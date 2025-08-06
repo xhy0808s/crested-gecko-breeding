@@ -3,553 +3,873 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🦎 크레스티드 게코 브리딩</title>
+    <title>🦎 크레스티드 게코 브리딩 시스템</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #ffffff;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #333;
-        }
-
-        .loading-container {
-            text-align: center;
-            padding: 40px;
-            background: #ffffff;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e5e7eb;
-        }
-
-        .loading-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            animation: bounce 2s infinite;
-            color: #03c75a;
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-10px); }
-            60% { transform: translateY(-5px); }
-        }
-
-        .loading-text {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            font-weight: 700;
-            color: #03c75a;
-        }
-
-        .loading-subtext {
-            font-size: 1.1rem;
-            margin-bottom: 20px;
-            color: #666;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #e5e7eb;
-            border-top: 4px solid #03c75a;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .device-info {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            font-size: 0.9rem;
-            color: #666;
-            border: 1px solid #e5e7eb;
-        }
-
-        /* PC 버전 스타일 */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
-            background: #ffffff;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-
-        .header h1 {
-            font-size: 3.5rem;
-            margin-bottom: 15px;
-            color: #03c75a;
-            font-weight: 800;
-        }
-
-        .header p {
-            font-size: 1.3rem;
-            color: #666;
-            font-weight: 300;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin-bottom: 50px;
-        }
-
-        .stat-card {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 30px;
-            text-align: center;
-            border: 1px solid #e5e7eb;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            border-color: #03c75a;
-        }
-
-        .stat-number {
-            font-size: 3rem;
-            font-weight: 800;
-            margin-bottom: 10px;
-            color: #03c75a;
-        }
-
-        .stat-label {
-            font-size: 1.1rem;
-            color: #666;
-            font-weight: 500;
-        }
-
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
-            margin-bottom: 50px;
-        }
-
-        .menu-item {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 30px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .menu-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(3, 199, 90, 0.1), transparent);
-            transition: left 0.5s;
-        }
-
-        .menu-item:hover::before {
-            left: 100%;
-        }
-
-        .menu-item:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-            border-color: #03c75a;
-        }
-
-        .menu-item i {
-            font-size: 3.5rem;
-            margin-bottom: 20px;
-            color: #03c75a;
-        }
-
-        .menu-item h3 {
-            font-size: 1.8rem;
-            margin-bottom: 15px;
-            font-weight: 700;
-            color: #333;
-        }
-
-        .menu-item p {
-            font-size: 1.1rem;
-            color: #666;
-            font-weight: 400;
-            line-height: 1.5;
-        }
-
-        .mobile-link {
-            text-align: center;
-            margin-top: 50px;
-        }
-
-        .mobile-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            background: #03c75a;
-            color: white;
-            text-decoration: none;
-            padding: 18px 35px;
-            border-radius: 30px;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(3, 199, 90, 0.3);
-        }
-
-        .mobile-btn:hover {
-            background: #02a94a;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(3, 199, 90, 0.4);
-        }
-
-        /* 모바일 최적화 */
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-                margin: 10px;
-            }
-
-            .header h1 {
-                font-size: 2.5rem;
-            }
-
-            .menu-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
-            .stats {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
-            }
-
-            .stat-card {
-                padding: 20px;
-            }
-
-            .stat-number {
-                font-size: 2rem;
-            }
-
-            .menu-item {
-                padding: 25px;
-            }
-
-            .menu-item i {
-                font-size: 2.5rem;
-            }
-
-            .menu-item h3 {
-                font-size: 1.5rem;
-            }
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+        body { font-family: 'Noto Sans KR', sans-serif; }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+  </style>
 </head>
-<body>
-    <div class="loading-container">
-        <div class="loading-icon">🦎</div>
-        <div class="loading-text">게코 브리딩 시스템</div>
-        <div class="loading-subtext">디바이스 감지 중...</div>
-        <div class="spinner"></div>
-        <div class="device-info" id="deviceInfo">
-            감지 중...
+<body class="bg-gradient-to-br from-green-50 to-blue-50 min-h-screen">
+    <!-- 헤더 -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-dragon text-2xl text-green-600"></i>
+                    <h1 class="text-xl font-bold text-gray-900">크레스티드 게코 브리딩 시스템</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div id="userInfo">
+                        <!-- 사용자 정보가 여기에 표시됩니다 -->
+                    </div>
+                    <div id="syncStatus" class="text-sm">
+                        <span class="text-gray-600">
+                            ⏳ 동기화 준비중
+                        </span>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="manualSync()" class="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700">
+                            <i class="fas fa-sync mr-1"></i>동기화
+                        </button>
+                        <div class="relative">
+                            <button onclick="toggleUserMenu()" class="px-3 py-1 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700">
+                                <i class="fas fa-user mr-1"></i>설정
+                            </button>
+                            <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                                <button onclick="window.userAuth.changeUser()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-user-switch mr-2"></i>사용자 변경
+                                </button>
+                                <button onclick="window.userAuth.logout()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>로그아웃
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- 통계 카드 -->
+        <div class="grid grid-cols-2 md:grid-cols-7 gap-4 mb-8">
+            <div class="bg-white rounded-lg shadow-md p-4 text-center">
+                <i class="fas fa-dragon text-2xl text-green-600 mb-2"></i>
+                <h3 class="text-lg font-semibold text-gray-900">총 개체</h3>
+                <p class="text-2xl font-bold text-green-600" id="totalAnimals">0</p>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-4 text-center">
+                <i class="fas fa-seedling text-2xl text-blue-600 mb-2"></i>
+                <h3 class="text-lg font-semibold text-gray-900">F1 세대</h3>
+                <p class="text-2xl font-bold text-blue-600" id="f1Count">0</p>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-4 text-center">
+                <i class="fas fa-leaf text-2xl text-yellow-600 mb-2"></i>
+                <h3 class="text-lg font-semibold text-gray-900">F2 세대</h3>
+                <p class="text-2xl font-bold text-yellow-600" id="f2Count">0</p>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-4 text-center">
+                <i class="fas fa-tree text-2xl text-purple-600 mb-2"></i>
+                <h3 class="text-lg font-semibold text-gray-900">F3 세대</h3>
+                <p class="text-2xl font-bold text-purple-600" id="f3Count">0</p>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-4 text-center">
+                <i class="fas fa-seedling text-2xl text-indigo-600 mb-2"></i>
+                <h3 class="text-lg font-semibold text-gray-900">F4+ 세대</h3>
+                <p class="text-2xl font-bold text-indigo-600" id="f4PlusCount">0</p>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-4 text-center">
+                <i class="fas fa-baby text-2xl text-pink-600 mb-2"></i>
+                <h3 class="text-lg font-semibold text-gray-900">베이비</h3>
+                <p class="text-2xl font-bold text-pink-600" id="babyCount">0</p>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-4 text-center">
+                <i class="fas fa-handshake text-2xl text-blue-600 mb-2"></i>
+                <h3 class="text-lg font-semibold text-gray-900">분양 완료</h3>
+                <p class="text-2xl font-bold text-blue-600" id="soldCount">0</p>
+            </div>
+        </div>
+
+        <!-- 메인 기능 버튼들 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
+            <button onclick="showAnimalRegistrationModal()" class="card-hover bg-white rounded-xl shadow-lg p-6 text-center border border-gray-200">
+                <i class="fas fa-plus-circle text-4xl text-green-600 mb-4"></i>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">개체 등록</h3>
+                <p class="text-sm text-gray-600">새로운 개체를 등록합니다</p>
+            </button>
+            
+            <button onclick="showAnimalListModal()" class="card-hover bg-white rounded-xl shadow-lg p-6 text-center border border-gray-200">
+                <i class="fas fa-list text-4xl text-blue-600 mb-4"></i>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">개체 목록</h3>
+                <p class="text-sm text-gray-600">등록된 개체들을 확인합니다</p>
+            </button>
+            
+            <button onclick="showBabyModal()" class="card-hover bg-white rounded-xl shadow-lg p-6 text-center border border-gray-200">
+                <i class="fas fa-baby text-4xl text-pink-600 mb-4"></i>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">베이비 등록</h3>
+                <p class="text-sm text-gray-600">새로 태어난 베이비를 등록합니다</p>
+            </button>
+            
+            <button onclick="showBabyListModal()" class="card-hover bg-white rounded-xl shadow-lg p-6 text-center border border-gray-200">
+                <i class="fas fa-heart text-4xl text-red-600 mb-4"></i>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">베이비 목록</h3>
+                <p class="text-sm text-gray-600">베이비들을 확인합니다</p>
+            </button>
+            
+            <button onclick="showSoldListModal()" class="card-hover bg-white rounded-xl shadow-lg p-6 text-center border border-gray-200">
+                <i class="fas fa-handshake text-4xl text-blue-600 mb-4"></i>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">분양 완료</h3>
+                <p class="text-sm text-gray-600">분양 완료된 개체들을 확인합니다</p>
+            </button>
+            
+            <button onclick="showBulkImportModal()" class="card-hover bg-white rounded-xl shadow-lg p-6 text-center border border-gray-200">
+                <i class="fas fa-file-import text-4xl text-purple-600 mb-4"></i>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">대량 가져오기</h3>
+                <p class="text-sm text-gray-600">Excel/CSV 파일로 한번에 많은 개체를 등록합니다</p>
+            </button>
+        </div>
+
+        <!-- 추가 기능 버튼들 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <button onclick="showMorphCalculatorModal()" class="card-hover bg-white rounded-xl shadow-lg p-6 text-center border border-gray-200">
+                <i class="fas fa-calculator text-4xl text-purple-600 mb-4"></i>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">모프 계산기</h3>
+                <p class="text-sm text-gray-600">모프 조합을 계산합니다</p>
+            </button>
+            
+            <button onclick="showFamilyTreeModal()" class="card-hover bg-white rounded-xl shadow-lg p-6 text-center border border-gray-200">
+                <i class="fas fa-sitemap text-4xl text-teal-600 mb-4"></i>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">혈통 트리</h3>
+                <p class="text-sm text-gray-600">혈통 관계를 확인합니다</p>
+            </button>
+        </div>
+    </main>
+
+    <!-- 모달 오버레이 -->
+    <div id="modalOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50" onclick="closeModal()">
+        <div class="flex items-center justify-center min-h-screen p-4" onclick="event.stopPropagation()">
+            <div id="modalContent" class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <!-- 모달 내용이 여기에 동적으로 삽입됩니다 -->
+            </div>
         </div>
     </div>
 
+    <script type="module" src="firebaseConfig.js"></script>
+    <script src="user-auth.js"></script>
+    <script src="firebase-sync.js"></script>
+    <script src="bulk-import.js"></script>
+    <script src="script.js"></script>
+    
     <script>
-        // 디바이스 감지
-        function detectDevice() {
-            const userAgent = navigator.userAgent;
-            const screenWidth = window.screen.width;
-            const screenHeight = window.screen.height;
-            
-            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent)) {
-                if (screenWidth >= 768 && screenHeight >= 1024) {
-                    return { type: 'TABLET', name: '태블릿', width: screenWidth, height: screenHeight };
-                } else {
-                    return { type: 'MOBILE', name: '모바일', width: screenWidth, height: screenHeight };
-                }
-            } else {
-                return { type: 'PC', name: '데스크톱', width: screenWidth, height: screenHeight };
-            }
-        }
-
-        // 디바이스 정보 표시
-        function showDeviceInfo(device) {
-            const deviceInfo = document.getElementById('deviceInfo');
-            deviceInfo.innerHTML = `
-                <strong>${device.name}</strong> 감지됨<br>
-                해상도: ${device.width} x ${device.height}<br>
-                브라우저: ${navigator.userAgent.split(' ').pop()}
-            `;
-        }
-
-        // 적절한 페이지로 리다이렉트
-        function redirectToAppropriatePage(device) {
-            const loadingText = document.querySelector('.loading-text');
-            const loadingSubtext = document.querySelector('.loading-subtext');
-
-            if (device.type === 'MOBILE' || device.type === 'TABLET') {
-                const urlParams = new URLSearchParams(window.location.search);
-                const testMode = urlParams.get('test');
-
-                if (testMode === 'true') {
-                    loadingText.textContent = '모바일 테스트 모드로 이동 중...';
-                    loadingSubtext.textContent = '개발자 테스트 인터페이스를 로드합니다';
-                    setTimeout(() => {
-                        window.location.href = 'mobile-test.html';
-                    }, 2000);
-                } else {
-                    loadingText.textContent = '모바일 앱으로 이동 중...';
-                    loadingSubtext.textContent = '터치 최적화된 인터페이스를 로드합니다';
-                    setTimeout(() => {
-                        window.location.href = 'mobile-app.html';
-                    }, 2000);
-                }
-            } else {
-                loadingText.textContent = '데스크톱 버전으로 이동 중...';
-                loadingSubtext.textContent = '전체 기능을 사용할 수 있습니다';
-                setTimeout(() => {
-                    showDesktopVersion();
-                }, 2000);
-            }
-        }
-
-        // 데스크톱 버전 표시
-        function showDesktopVersion() {
-            document.body.innerHTML = `
-                <div class="container">
-                    <div class="header">
-                        <h1>🦎 크레스티드 게코 브리딩</h1>
-                        <p>개인 브리딩 관리 시스템</p>
-                    </div>
-
-                    <div class="stats">
-                        <div class="stat-card">
-                            <div class="stat-number" id="totalAnimals">0</div>
-                            <div class="stat-label">등록된 개체</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="totalGenerations">5</div>
-                            <div class="stat-label">세대 관리</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="totalHatchings">0</div>
-                            <div class="stat-label">해칭 관리</div>
-                        </div>
-                    </div>
-
-                    <div class="menu-grid">
-                        <div class="menu-item" onclick="showAnimalRegistration()">
-                            <i class="fas fa-plus-circle"></i>
-                            <h3>개체 등록</h3>
-                            <p>F1~F5 세대 개체 등록</p>
-                        </div>
-                        
-                        <div class="menu-item" onclick="showAnimalList()">
-                            <i class="fas fa-list"></i>
-                            <h3>개체 목록</h3>
-                            <p>등록된 개체 관리 및 수정</p>
-                        </div>
-                        
-                        <div class="menu-item" onclick="showMorphCalculator()">
-                            <i class="fas fa-calculator"></i>
-                            <h3>모프 계산기</h3>
-                            <p>부모 모프로 자손 모프 계산</p>
-                        </div>
-                        
-                        <div class="menu-item" onclick="showFamilyTreeViewer()">
-                            <i class="fas fa-sitemap"></i>
-                            <h3>가족 관계 확인</h3>
-                            <p>F1~F5 세대 부모-자식 관계</p>
-                        </div>
-                        
-                        <div class="menu-item" onclick="showHatchingManagement()">
-                            <i class="fas fa-egg"></i>
-                            <h3>해칭 관리</h3>
-                            <p>알 관리 및 해칭 일정</p>
-                        </div>
-                        
-                        <div class="menu-item" onclick="showDataSync()">
-                            <i class="fas fa-sync-alt"></i>
-                            <h3>데이터 동기화</h3>
-                            <p>PC와 모바일 데이터 동기화</p>
-                        </div>
+        // 모달 함수들
+        function showAnimalRegistrationModal() {
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = `
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-900"><i class="fas fa-plus-circle mr-2"></i>개체 등록</h2>
+                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
                     </div>
                     
-                    <div class="mobile-link">
-                        <a href="mobile-app.html" class="mobile-btn">
-                            <i class="fas fa-mobile-alt"></i>
-                            모바일 버전으로 보기
-                        </a>
-                    </div>
-                    
-                    <div style="text-align: center; margin-top: 30px;">
-                        <div id="sync-status-display" style="
-                            display: inline-flex;
-                            align-items: center;
-                            gap: 10px;
-                            background: #f8f9fa;
-                            padding: 12px 20px;
-                            border-radius: 25px;
-                            border: 1px solid #e5e7eb;
-                            font-size: 14px;
-                            color: #666;
-                        ">
-                            <div id="sync-indicator" style="
-                                width: 8px;
-                                height: 8px;
-                                border-radius: 50%;
-                                background: #03c75a;
-                                animation: pulse 2s infinite;
-                            "></div>
-                            <span id="sync-text">실시간 동기화 활성화</span>
-                            <button onclick="manualSync()" style="
-                                background: #03c75a;
-                                color: white;
-                                border: none;
-                                padding: 6px 12px;
-                                border-radius: 15px;
-                                font-size: 12px;
-                                cursor: pointer;
-                                margin-left: 10px;
-                            ">수동 동기화</button>
+                    <form class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">개체 이름 *</label>
+                            <input type="text" id="animalName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" required>
                         </div>
-                    </div>
-                    
-                    <style>
-                        @keyframes pulse {
-                            0% { opacity: 1; }
-                            50% { opacity: 0.5; }
-                            100% { opacity: 1; }
-                        }
-                    </style>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">성별 *</label>
+                            <select id="animalGender" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" required>
+                                <option value="">선택하세요</option>
+                                <option value="수컷">수컷</option>
+                                <option value="암컷">암컷</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">세대 *</label>
+                            <select id="animalGeneration" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" required>
+                                <option value="">선택하세요</option>
+                                <option value="F1">F1</option>
+                                <option value="F2">F2</option>
+                                <option value="F3">F3</option>
+                                <option value="F4">F4</option>
+                                <option value="F5">F5</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">모프</label>
+                            <div class="relative">
+                                <input type="text" id="animalMorphSearch" placeholder="모프 검색 또는 선택..." 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                       autocomplete="off">
+                                <div id="animalMorphDropdown" class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden">
+                                    <div class="p-2 border-b border-gray-200">
+                                        <div class="text-xs font-semibold text-gray-500 mb-2">인기 모프</div>
+                                        <div class="grid grid-cols-2 gap-1">
+                                            <button type="button" class="morph-option px-2 py-1 text-xs bg-gray-100 hover:bg-green-100 rounded" data-value="노멀">노멀</button>
+                                            <button type="button" class="morph-option px-2 py-1 text-xs bg-gray-100 hover:bg-green-100 rounded" data-value="릴리화이트">릴리화이트</button>
+                                            <button type="button" class="morph-option px-2 py-1 text-xs bg-gray-100 hover:bg-green-100 rounded" data-value="달마시안">달마시안</button>
+                                            <button type="button" class="morph-option px-2 py-1 text-xs bg-gray-100 hover:bg-green-100 rounded" data-value="할리퀸">할리퀸</button>
+                                        </div>
+                                    </div>
+                                    <div class="max-h-48 overflow-y-auto">
+                                        <div class="morph-group">
+                                            <div class="px-3 py-2 text-xs font-semibold text-gray-600 bg-gray-50">베이스 모프</div>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="노멀">노멀</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="루아">루아</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="부항">부항</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="릴리화이트">릴리화이트</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="헷아직">헷아직</button>
+                                        </div>
+                                        <div class="morph-group">
+                                            <div class="px-3 py-2 text-xs font-semibold text-gray-600 bg-gray-50">패턴 모프</div>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="세이블">세이블</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="아잔틱">아잔틱</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="초초">초초</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="카푸치노">카푸치노</button>
+                                        </div>
+                                        <div class="morph-group">
+                                            <div class="px-3 py-2 text-xs font-semibold text-gray-600 bg-gray-50">조합 모프</div>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="달마시안">달마시안</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="슈퍼달마시안">슈퍼달마시안</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="브링들">브링들</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="솔리드백">솔리드백</button>
+                                        </div>
+                                        <div class="morph-group">
+                                            <div class="px-3 py-2 text-xs font-semibold text-gray-600 bg-gray-50">고급 모프</div>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="할리퀸">할리퀸</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="팬텀">팬텀</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="핀스트라이프">핀스트라이프</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="화이트잇">화이트잇</button>
+                                        </div>
+                                        <div class="morph-group">
+                                            <div class="px-3 py-2 text-xs font-semibold text-gray-600 bg-gray-50">색상 모프</div>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="레드">레드</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="옐로우">옐로우</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="크림">크림</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="타이거">타이거</button>
+                                        </div>
+                                        <div class="morph-group">
+                                            <div class="px-3 py-2 text-xs font-semibold text-gray-600 bg-gray-50">특수 모프</div>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="바이">바이</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="트라이">트라이</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="RCK">RCK</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-green-50" data-value="SPT">SPT</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="animalMorph" value="">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">이미지</label>
+                            <input type="file" id="animalImage" accept="image/*" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                        </div>
+                        
+                        <div class="flex justify-end space-x-3 pt-4">
+                            <button type="button" onclick="closeModal()" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">
+                                취소
+                            </button>
+                            <button type="button" onclick="registerAnimal()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                                등록
+                            </button>
+                        </div>
+                    </form>
                 </div>
             `;
-            
-            initializeDesktopApp();
+            document.getElementById('modalOverlay').classList.remove('hidden');
         }
 
-        // 데스크톱 앱 초기화
-        function initializeDesktopApp() {
-            updateStats();
+        function showAnimalListModal() {
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = `
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-900"><i class="fas fa-list mr-2"></i>개체 목록</h2>
+                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div id="animalListContainer">
+                        <!-- 개체 목록이 여기에 표시됩니다 -->
+                    </div>
+                </div>
+            `;
+            document.getElementById('modalOverlay').classList.remove('hidden');
             
-            // Firebase 설정 스크립트 로드
-            if (typeof window.firebaseConfig === 'undefined') {
-                const firebaseScript = document.createElement('script');
-                firebaseScript.src = 'firebase-config.js';
-                document.head.appendChild(firebaseScript);
-            }
-            
-            // Firebase 자동 설정 스크립트 로드
-            if (typeof window.firebaseSetup === 'undefined') {
-                const setupScript = document.createElement('script');
-                setupScript.src = 'auto-firebase-setup.js';
-                document.head.appendChild(setupScript);
-            }
-            
-            // 실시간 동기화 시스템 로드
-            if (typeof window.realTimeSync === 'undefined') {
-                const script = document.createElement('script');
-                script.src = 'real-time-sync.js';
-                document.head.appendChild(script);
-            }
-            
-            // 서버 기반 동기화 시스템 로드
-            if (typeof window.serverSync === 'undefined') {
-                const script = document.createElement('script');
-                script.src = 'server-sync.js';
-                document.head.appendChild(script);
-            }
-            
-            // 이미지 동기화 시스템 로드
-            if (typeof window.imageSync === 'undefined') {
-                const script = document.createElement('script');
-                script.src = 'image-sync.js';
-                document.head.appendChild(script);
-            }
+            // 모프 검색 기능 초기화
+            initializeMorphSearch('animalMorphSearch', 'animalMorphDropdown', 'animalMorph');
+            loadAnimalList();
         }
 
-        // 통계 업데이트
-        function updateStats() {
+        function showBabyModal() {
+            // 등록된 개체들 가져오기
+            const animals = getAllAnimals();
+            const maleAnimals = animals.filter(a => a.gender === '수컷' && a.status === '활성');
+            const femaleAnimals = animals.filter(a => a.gender === '암컷' && a.status === '활성');
+            
+            let maleOptions = '<option value="">선택하세요</option>';
+            maleAnimals.forEach(animal => {
+                maleOptions += `<option value="${animal.name}">${animal.name} (${animal.generation}세대, ${animal.morph || 'Normal'})</option>`;
+            });
+            
+            let femaleOptions = '<option value="">선택하세요</option>';
+            femaleAnimals.forEach(animal => {
+                femaleOptions += `<option value="${animal.name}">${animal.name} (${animal.generation}세대, ${animal.morph || 'Normal'})</option>`;
+            });
+
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = `
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-900"><i class="fas fa-baby mr-2"></i>베이비 등록</h2>
+                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="mb-4 p-3 bg-blue-50 rounded-lg">
+                        <p class="text-sm text-blue-800">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            베이비 ID는 자동으로 생성됩니다. (형식: YYMMDD-부모이니셜-순번)
+                        </p>
+                        <p class="text-xs text-blue-600 mt-1">
+                            예시: 241215-루퍼-01 (2024년 12월 15일, 루시퍼×퍼시, 1번째)
+                        </p>
+                    </div>
+                    
+                    <form class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">성별 *</label>
+                            <select id="babyGender" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent" required>
+                                <option value="">선택하세요</option>
+                                <option value="미구분">미구분</option>
+                                <option value="수컷">수컷</option>
+                                <option value="수컷 추정">수컷 추정</option>
+                                <option value="암컷">암컷</option>
+                                <option value="암컷 추정">암컷 추정</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">모프</label>
+                            <div class="relative">
+                                <input type="text" id="babyMorphSearch" placeholder="모프 검색 또는 선택..." 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                                       autocomplete="off">
+                                <div id="babyMorphDropdown" class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden">
+                                    <div class="p-2 border-b border-gray-200">
+                                        <div class="text-xs font-semibold text-gray-500 mb-2">인기 모프</div>
+                                        <div class="grid grid-cols-2 gap-1">
+                                            <button type="button" class="morph-option px-2 py-1 text-xs bg-gray-100 hover:bg-pink-100 rounded" data-value="노멀">노멀</button>
+                                            <button type="button" class="morph-option px-2 py-1 text-xs bg-gray-100 hover:bg-pink-100 rounded" data-value="릴리화이트">릴리화이트</button>
+                                            <button type="button" class="morph-option px-2 py-1 text-xs bg-gray-100 hover:bg-pink-100 rounded" data-value="달마시안">달마시안</button>
+                                            <button type="button" class="morph-option px-2 py-1 text-xs bg-gray-100 hover:bg-pink-100 rounded" data-value="할리퀸">할리퀸</button>
+                                        </div>
+                                    </div>
+                                    <div class="max-h-48 overflow-y-auto">
+                                        <div class="morph-group">
+                                            <div class="px-3 py-2 text-xs font-semibold text-gray-600 bg-gray-50">베이스 모프</div>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="노멀">노멀</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="루아">루아</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="부항">부항</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="부항 밀리">부항 밀리</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="밀리 세이블">밀리 세이블</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="릴리화이트">릴리화이트</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="헷아직">헷아직</button>
+                                        </div>
+                                        <div class="morph-group">
+                                            <div class="px-3 py-2 text-xs font-semibold text-gray-600 bg-gray-50">패턴 모프</div>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="세이블">세이블</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="아잔틱">아잔틱</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="초초">초초</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="카푸치노">카푸치노</button>
+                                        </div>
+                                        <div class="morph-group">
+                                            <div class="px-3 py-2 text-xs font-semibold text-gray-600 bg-gray-50">조합 모프</div>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="달마시안">달마시안</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="슈퍼달마시안">슈퍼달마시안</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="브링들">브링들</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="솔리드백">솔리드백</button>
+                                        </div>
+                                        <div class="morph-group">
+                                            <div class="px-3 py-2 text-xs font-semibold text-gray-600 bg-gray-50">고급 모프</div>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="할리퀸">할리퀸</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="팬텀">팬텀</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="핀스트라이프">핀스트라이프</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="화이트잇">화이트잇</button>
+                                        </div>
+                                        <div class="morph-group">
+                                            <div class="px-3 py-2 text-xs font-semibold text-gray-600 bg-gray-50">색상 모프</div>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="레드">레드</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="옐로우">옐로우</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="크림">크림</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="타이거">타이거</button>
+                                        </div>
+                                        <div class="morph-group">
+                                            <div class="px-3 py-2 text-xs font-semibold text-gray-600 bg-gray-50">특수 모프</div>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="바이">바이</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="트라이">트라이</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="RCK">RCK</button>
+                                            <button type="button" class="morph-option w-full text-left px-3 py-2 text-sm hover:bg-pink-50" data-value="SPT">SPT</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="babyMorph" value="">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">예상 세대 (자동 계산)</label>
+                            <input type="text" id="babyGeneration" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50" placeholder="부모를 선택하면 자동으로 계산됩니다" readonly>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">부개체 (수컷) *</label>
+                            <select id="babyParent1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent" required>
+                                ${maleOptions}
+                            </select>
+                            ${maleAnimals.length === 0 ? '<p class="text-xs text-red-600 mt-1">등록된 수컷 개체가 없습니다. 먼저 개체를 등록해주세요.</p>' : ''}
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">모개체 (암컷) *</label>
+                            <select id="babyParent2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent" required>
+                                ${femaleOptions}
+                            </select>
+                            ${femaleAnimals.length === 0 ? '<p class="text-xs text-red-600 mt-1">등록된 암컷 개체가 없습니다. 먼저 개체를 등록해주세요.</p>' : ''}
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">태어난 날짜 *</label>
+                            <input type="date" id="babyBirthDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">이미지</label>
+                            <input type="file" id="babyImage" accept="image/*" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent">
+                        </div>
+                        
+                        <div class="flex justify-end space-x-3 pt-4">
+                            <button type="button" onclick="closeModal()" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">
+                                취소
+                            </button>
+                            <button type="button" onclick="registerBaby()" class="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700">
+                                등록
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            document.getElementById('modalOverlay').classList.remove('hidden');
+            
+            // 부모 선택 시 세대 자동 계산
+            function updateBabyGeneration() {
+                const parent1Name = document.getElementById('babyParent1').value;
+                const parent2Name = document.getElementById('babyParent2').value;
+                const generationField = document.getElementById('babyGeneration');
+                
+                if (parent1Name && parent2Name) {
+                    const animals = getAllAnimals();
+                    const parent1 = animals.find(a => a.name === parent1Name);
+                    const parent2 = animals.find(a => a.name === parent2Name);
+                    
+                    if (parent1 && parent2) {
+                        const parent1Gen = parseInt(parent1.generation.replace('F', ''));
+                        const parent2Gen = parseInt(parent2.generation.replace('F', ''));
+                        const maxParentGen = Math.max(parent1Gen, parent2Gen);
+                        const babyGeneration = Math.min(maxParentGen + 1, 6); // 최대 F6
+                        
+                        generationField.value = `F${babyGeneration}`;
+                        generationField.classList.remove('bg-gray-50');
+                        generationField.classList.add('bg-green-50', 'text-green-800', 'font-semibold');
+                    }
+                } else {
+                    generationField.value = '';
+                    generationField.placeholder = '부모를 선택하면 자동으로 계산됩니다';
+                    generationField.classList.remove('bg-green-50', 'text-green-800', 'font-semibold');
+                    generationField.classList.add('bg-gray-50');
+                }
+            }
+            
+            // 이벤트 리스너 추가
+            document.getElementById('babyParent1').addEventListener('change', updateBabyGeneration);
+            document.getElementById('babyParent2').addEventListener('change', updateBabyGeneration);
+            
+            // 모프 검색 기능 초기화
+            initializeMorphSearch('babyMorphSearch', 'babyMorphDropdown', 'babyMorph');
+        }
+
+        function showBabyListModal() {
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = `
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-900"><i class="fas fa-heart mr-2"></i>베이비 목록</h2>
+                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div id="babyListContainer">
+                        <!-- 베이비 목록이 여기에 표시됩니다 -->
+                    </div>
+                </div>
+            `;
+            document.getElementById('modalOverlay').classList.remove('hidden');
+            loadBabyList();
+        }
+
+        function showMorphCalculatorModal() {
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = `
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-900"><i class="fas fa-calculator mr-2"></i>모프 계산기</h2>
+                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">부개체 모프</label>
+                            <select id="fatherMorphs" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                <option value="">선택하세요</option>
+                                <option value="Normal">Normal</option>
+                                <option value="Super Dalmatian">Super Dalmatian</option>
+                                <option value="Lily White">Lily White</option>
+                                <option value="Pinstripe">Pinstripe</option>
+                                <option value="Harlequin">Harlequin</option>
+                                <option value="Tremper Albino">Tremper Albino</option>
+                                <option value="Bell Albino">Bell Albino</option>
+                                <option value="Creamsicle">Creamsicle</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">모개체 모프</label>
+                            <select id="motherMorphs" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                <option value="">선택하세요</option>
+                                <option value="Normal">Normal</option>
+                                <option value="Super Dalmatian">Super Dalmatian</option>
+                                <option value="Lily White">Lily White</option>
+                                <option value="Pinstripe">Pinstripe</option>
+                                <option value="Harlequin">Harlequin</option>
+                                <option value="Tremper Albino">Tremper Albino</option>
+                                <option value="Bell Albino">Bell Albino</option>
+                                <option value="Creamsicle">Creamsicle</option>
+                            </select>
+  </div>
+
+                        <div class="flex justify-end space-x-3 pt-4">
+                            <button type="button" onclick="closeModal()" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">
+                                취소
+                            </button>
+                            <button type="button" onclick="calculateMorphs()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                                계산
+                            </button>
+  </div>
+
+                        <div id="morphResults" class="mt-6 p-4 bg-gray-50 rounded-lg">
+                            <!-- 계산 결과가 여기에 표시됩니다 -->
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('modalOverlay').classList.remove('hidden');
+        }
+
+                function showSoldListModal() {
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = `
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-900"><i class="fas fa-handshake mr-2"></i>분양 완료 목록</h2>
+                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div id="soldListContainer">
+                        <!-- 분양 완료 목록이 여기에 표시됩니다 -->
+                    </div>
+                </div>
+            `;
+            document.getElementById('modalOverlay').classList.remove('hidden');
+            loadSoldList();
+        }
+
+        function showBulkImportModal() {
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = `
+                <div class="p-6 max-w-4xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-900">
+                            <i class="fas fa-file-import mr-2"></i>대량 데이터 가져오기
+                        </h2>
+                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <!-- 130마리 안내 -->
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                            <div class="flex items-start">
+                                <i class="fas fa-exclamation-triangle text-yellow-600 mt-1 mr-3"></i>
+                                <div>
+                                    <h3 class="font-semibold text-yellow-800">대량 데이터 관리 모드</h3>
+                                    <p class="text-sm text-yellow-700 mt-1">
+                                        130마리의 도마뱀 데이터를 효율적으로 관리하기 위해 최적화된 시스템입니다.
+                                        이미지는 자동으로 압축되며, 클라우드 동기화로 안전하게 보관됩니다.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 파일 업로드 -->
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2">파일 선택</h3>
+                            <p class="text-sm text-gray-500 mb-4">
+                                CSV, Excel, JSON 파일을 드래그하거나 클릭하여 선택하세요
+                            </p>
+                            <input type="file" id="bulkImportFile" accept=".csv,.xlsx,.xls,.json" 
+                                   class="hidden" onchange="handleBulkImport(this)">
+                            <button onclick="document.getElementById('bulkImportFile').click()" 
+                                    class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                                파일 선택
+                            </button>
+                        </div>
+                        
+                        <!-- 템플릿 다운로드 -->
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <h3 class="font-semibold text-blue-800 mb-2">
+                                <i class="fas fa-download mr-2"></i>템플릿 다운로드
+                            </h3>
+                            <p class="text-sm text-blue-700 mb-3">
+                                아래 템플릿을 다운로드하여 데이터를 정리한 후 업로드하세요.
+                            </p>
+                            <button onclick="window.bulkDataManager.downloadTemplate()" 
+                                    class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700">
+                                <i class="fas fa-file-csv mr-2"></i>CSV 템플릿 다운로드
+                            </button>
+                        </div>
+                        
+                        <!-- 현재 데이터 내보내기 -->
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                            <h3 class="font-semibold text-green-800 mb-2">
+                                <i class="fas fa-upload mr-2"></i>현재 데이터 백업
+                            </h3>
+                            <p class="text-sm text-green-700 mb-3">
+                                현재 등록된 모든 데이터를 JSON 파일로 백업할 수 있습니다.
+                            </p>
+                            <button onclick="window.bulkDataManager.exportData()" 
+                                    class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700">
+                                <i class="fas fa-download mr-2"></i>전체 데이터 백업
+                            </button>
+                        </div>
+                        
+                        <!-- 진행률 표시 -->
+                        <div id="importProgress" class="hidden">
+                            <!-- 진행률이 여기에 표시됩니다 -->
+                        </div>
+                        
+                        <!-- 사용 가이드 -->
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                            <h3 class="font-semibold text-gray-800 mb-2">
+                                <i class="fas fa-info-circle mr-2"></i>사용 가이드
+                            </h3>
+                            <div class="text-sm text-gray-700 space-y-1">
+                                <p><strong>1. CSV 형식:</strong> name,gender,generation,morph,birthDate,parent1,parent2</p>
+                                <p><strong>2. 성별:</strong> 수컷, 암컷, 미구분 (또는 male, female)</p>
+                                <p><strong>3. 세대:</strong> F1, F2, F3, F4, F5, F6</p>
+                                <p><strong>4. 날짜:</strong> YYYY-MM-DD 형식 (예: 2024-01-15)</p>
+                                <p><strong>5. 이미지:</strong> 파일 업로드 후 개별적으로 추가 가능</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('modalOverlay').classList.remove('hidden');
+        }
+
+        function showFamilyTreeModal() {
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = `
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-900"><i class="fas fa-sitemap mr-2"></i>혈통 트리</h2>
+                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+
+                    <div class="text-center py-8">
+                        <i class="fas fa-tools text-4xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500">준비 중입니다...</p>
+                        <p class="text-sm text-gray-400 mt-2">곧 업데이트될 예정입니다!</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('modalOverlay').classList.remove('hidden');
+        }
+        
+        // 모프 검색 기능
+        function initializeMorphSearch(searchInputId, dropdownId, hiddenInputId) {
+            const searchInput = document.getElementById(searchInputId);
+            const dropdown = document.getElementById(dropdownId);
+            const hiddenInput = document.getElementById(hiddenInputId);
+            
+            if (!searchInput || !dropdown || !hiddenInput) return;
+            
+            // 검색 입력 시 필터링
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const morphOptions = dropdown.querySelectorAll('.morph-option');
+                const morphGroups = dropdown.querySelectorAll('.morph-group');
+                
+                if (searchTerm === '') {
+                    // 검색어가 없으면 모든 항목 표시
+                    morphOptions.forEach(option => option.style.display = 'block');
+                    morphGroups.forEach(group => group.style.display = 'block');
+                } else {
+                    // 검색어와 일치하는 항목만 표시
+                    morphGroups.forEach(group => {
+                        const groupOptions = group.querySelectorAll('.morph-option');
+                        let hasVisibleOptions = false;
+                        
+                        groupOptions.forEach(option => {
+                            const morphName = option.textContent.toLowerCase();
+                            if (morphName.includes(searchTerm)) {
+                                option.style.display = 'block';
+                                hasVisibleOptions = true;
+                            } else {
+                                option.style.display = 'none';
+                            }
+                        });
+                        
+                        // 그룹에 보이는 옵션이 있으면 그룹도 표시
+                        group.style.display = hasVisibleOptions ? 'block' : 'none';
+                    });
+                }
+            });
+            
+            // 포커스 시 드롭다운 표시
+            searchInput.addEventListener('focus', function() {
+                dropdown.classList.remove('hidden');
+            });
+            
+            // 외부 클릭 시 드롭다운 숨김
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+            
+            // 모프 옵션 클릭 시 선택
+            dropdown.addEventListener('click', function(e) {
+                if (e.target.classList.contains('morph-option')) {
+                    const selectedValue = e.target.getAttribute('data-value');
+                    searchInput.value = selectedValue;
+                    hiddenInput.value = selectedValue;
+                    dropdown.classList.add('hidden');
+                }
+            });
+            
+            // 엔터키 처리
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const visibleOptions = dropdown.querySelectorAll('.morph-option[style*="block"], .morph-option:not([style])');
+                    if (visibleOptions.length > 0) {
+                        const firstOption = visibleOptions[0];
+                        const selectedValue = firstOption.getAttribute('data-value');
+                        searchInput.value = selectedValue;
+                        hiddenInput.value = selectedValue;
+                        dropdown.classList.add('hidden');
+                    }
+                }
+                
+                if (e.key === 'Escape') {
+                    dropdown.classList.add('hidden');
+                }
+            });
+        }
+        
+        // 수동 동기화 함수
+        function manualSync() {
+            if (window.firebaseSync) {
+                window.firebaseSync.manualSync();
+            } else {
+                alert('동기화 시스템이 아직 초기화되지 않았습니다. 잠시 후 다시 시도해주세요.');
+            }
+        }
+        
+        // 사용자 메뉴 토글
+        function toggleUserMenu() {
+            const menu = document.getElementById('userMenu');
+            menu.classList.toggle('hidden');
+        }
+        
+        // 외부 클릭 시 메뉴 닫기
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('userMenu');
+            const button = e.target.closest('button[onclick="toggleUserMenu()"]');
+            
+            if (!button && menu && !menu.contains(e.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+        
+        // 대량 가져오기 처리
+        async function handleBulkImport(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
             try {
-                const animals = JSON.parse(localStorage.getItem('animals') || '[]');
-                const hatchings = JSON.parse(localStorage.getItem('hatchings') || '[]');
+                document.getElementById('importProgress').classList.remove('hidden');
                 
-                const totalAnimalsElement = document.getElementById('totalAnimals');
-                const totalHatchingsElement = document.getElementById('totalHatchings');
+                console.log('📁 파일 처리 시작:', file.name);
+                await window.bulkDataManager.importFromFile(file);
                 
-                if (totalAnimalsElement) {
-                    totalAnimalsElement.textContent = animals.length;
+                // UI 새로고침
+                if (window.updateStatistics) {
+                    window.updateStatistics();
                 }
-                if (totalHatchingsElement) {
-                    totalHatchingsElement.textContent = hatchings.length;
+                
+                // 개체 목록이 열려있으면 새로고침
+                if (document.getElementById('animalListContainer')) {
+                    window.loadAnimalList();
                 }
+                
             } catch (error) {
-                console.error('통계 업데이트 오류:', error);
+                console.error('대량 가져오기 실패:', error);
+                alert('파일 처리 중 오류가 발생했습니다: ' + error.message);
+                
+                document.getElementById('importProgress').innerHTML = `
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-exclamation-circle text-red-600 mr-2"></i>
+                            <span class="text-red-800 font-semibold">오류 발생</span>
+                        </div>
+                        <p class="text-sm text-red-700 mt-1">${error.message}</p>
+                    </div>
+                `;
             }
         }
-
-        // 네비게이션 함수들
-        function showAnimalRegistration() {
-            window.location.href = 'register.html';
-        }
-
-        function showAnimalList() {
-            window.location.href = 'list-fixed.html';
-        }
-
-        function showMorphCalculator() {
-            window.location.href = 'morph-calculator.html';
-        }
-
-        function showFamilyTreeViewer() {
-            window.location.href = 'family-tree-viewer.html';
-        }
-
-        function showHatchingManagement() {
-            window.location.href = 'hatching.html';
-        }
-
-        function showDataSync() {
-            window.location.href = 'sync-data.html';
-        }
-
-        // 페이지 로드 시 디바이스 감지
-        window.onload = function() {
-            const device = detectDevice();
-            showDeviceInfo(device);
-            redirectToAppropriatePage(device);
-        };
     </script>
 </body>
 </html>
