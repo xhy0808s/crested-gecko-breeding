@@ -7,7 +7,14 @@
     "start": "python3 -m http.server 8000",
     "dev": "python3 -m http.server 8000"
   },
-  "keywords": ["gecko", "breeding", "management"],
+  "keywords": [
+    "gecko",
+    "breeding",
+    "management"
+  ],
   "author": "개발자",
-  "license": "MIT"
-} 
+  "license": "MIT",
+  "dependencies": {
+    "anthropic-ai": "^0.0.10"
+  }
+}
