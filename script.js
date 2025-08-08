@@ -1,4 +1,6 @@
 // 간단한 파충류 브리딩 관리 시스템
+'use strict';
+
 const LOCAL_STORAGE_KEY = 'gecko-breeding-data';
 
 // 디바운싱 함수
@@ -14,17 +16,84 @@ window.debounce = function(func, wait) {
     };
 };
 
-// 데이터 가져오기 함수들
+// 안전한 localStorage 접근 함수들
+window.safeLocalStorageGet = function(key, defaultValue = []) {
+    try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : defaultValue;
+    } catch (error) {
+        console.error(`localStorage 읽기 오류 (${key}):`, error);
+        return defaultValue;
+    }
+};
+
+window.safeLocalStorageSet = function(key, value) {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+        return true;
+    } catch (error) {
+        if (error.name === 'QuotaExceededError') {
+            console.error('localStorage 용량 초과:', error);
+            if (window.showToast) {
+                window.showToast('저장 공간이 부족합니다. 일부 데이터를 정리해주세요.', 'warning');
+            }
+        } else {
+            console.error(`localStorage 저장 오류 (${key}):`, error);
+        }
+        return false;
+    }
+};
+
+// 데이터 가져오기 함수들 (안전한 버전)
 window.getAllAnimals = function() {
-    return JSON.parse(localStorage.getItem('geckoBreedingData') || '[]');
+    return safeLocalStorageGet('geckoBreedingData', []);
 };
 
 window.getBabies = function() {
-    return JSON.parse(localStorage.getItem('babies') || '[]');
+    return safeLocalStorageGet('babies', []);
 };
 
 window.getHealthRecords = function() {
-    return JSON.parse(localStorage.getItem('healthRecords') || '[]');
+    return safeLocalStorageGet('healthRecords', []);
+};
+
+// 안전한 HTML 생성을 위한 유틸리티 함수
+window.sanitizeInput = function(input) {
+    if (typeof input !== 'string') return '';
+    return input
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;');
+};
+
+window.createElementSafely = function(tagName, attributes = {}, children = []) {
+    const element = document.createElement(tagName);
+    
+    // 속성 설정
+    Object.keys(attributes).forEach(key => {
+        if (key === 'className') {
+            element.className = attributes[key];
+        } else if (key === 'innerHTML') {
+            // innerHTML 대신 textContent 사용 권장
+            console.warn('innerHTML 사용을 피하고 textContent를 사용하세요.');
+            element.innerHTML = attributes[key];
+        } else {
+            element.setAttribute(key, attributes[key]);
+        }
+    });
+    
+    // 자식 요소 추가
+    children.forEach(child => {
+        if (typeof child === 'string') {
+            element.appendChild(document.createTextNode(child));
+        } else if (child instanceof Node) {
+            element.appendChild(child);
+        }
+    });
+    
+    return element;
 };
 
 // 전역 함수들
@@ -315,9 +384,25 @@ window.saveAnimal = async function(name, gender, generation, morph, imageData) {
     };
     
     try {
-        let animals = getAllAnimals();
+        // 입력값 검증
+        if (!name || !gender || !generation) {
+            throw new Error('필수 항목이 누락되었습니다.');
+        }
+        
+        // 이름 중복 검사
+        const animals = getAllAnimals();
+        const duplicateAnimal = animals.find(a => a.name.toLowerCase() === name.toLowerCase());
+        if (duplicateAnimal) {
+            throw new Error(`이미 "${name}" 이름의 개체가 존재합니다.`);
+        }
+        
         animals.push(animal);
-        localStorage.setItem('geckoBreedingData', JSON.stringify(animals));
+        
+        // 안전한 저장
+        const saveSuccess = safeLocalStorageSet('geckoBreedingData', animals);
+        if (!saveSuccess) {
+            throw new Error('데이터 저장에 실패했습니다.');
+        }
         
         // Firebase 동기화 (에러 방지)
         try {

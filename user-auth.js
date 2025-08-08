@@ -1,4 +1,6 @@
 // 간단한 사용자 인증 시스템
+'use strict';
+
 class UserAuth {
     constructor() {
         this.currentUser = this.getCurrentUser();

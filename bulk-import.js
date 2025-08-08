@@ -1,4 +1,6 @@
 // 대량 데이터 가져오기 및 최적화 시스템
+'use strict';
+
 // 전역 오류 처리
 window.addEventListener('error', function(e) {
     console.error('전역 오류:', e.error);

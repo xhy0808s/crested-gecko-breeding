@@ -2,10 +2,10 @@
   "name": "크레스티드 게코 브리딩 관리",
   "short_name": "게코 브리딩",
   "description": "실시간 동기화 지원 크레스티드 게코 브리딩 관리 시스템",
-  "start_url": "./index.html",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#10b981",
+  "theme_color": "#1565C0",
   "orientation": "portrait",
   "scope": "./",
   "lang": "ko",
@@ -61,6 +61,20 @@
           "sizes": "192x192"
         }
       ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "file_handlers": [
+    {
+      "action": "./",
+      "accept": {
+        "text/csv": [".csv"],
+        "application/json": [".json"]
+      }
     }
   ]
 } 

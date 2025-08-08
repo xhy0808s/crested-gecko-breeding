@@ -1,4 +1,6 @@
 // Firebase 실시간 동기화 시스템
+'use strict';
+
 class FirebaseSync {
     constructor() {
         this.isOnline = navigator.onLine;

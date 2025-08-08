@@ -3,24 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>크레스티드 게코 브리딩 시스템</title>
+    <meta name="description" content="실시간 동기화 지원 크레스티드 게코 브리딩 관리 시스템 - PC와 모바일 간 완벽 동기화">
+    <meta name="keywords" content="크레스티드게코, 브리딩, 파충류, 관리시스템, PWA, 실시간동기화">
+    <meta name="author" content="크레스티드 게코 브리더">
+    <meta name="robots" content="index, follow">
     
-    <!-- PWA -->
+    <!-- PWA 설정 -->
     <link rel="manifest" href="manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="게코 브리딩">
     <meta name="theme-color" content="#1565C0">
+    <meta name="msapplication-TileColor" content="#1565C0">
+    
+    <!-- 보안 헤더 -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self'; 
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://www.gstatic.com; 
+        style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; 
+        font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; 
+        img-src 'self' data: blob: https:; 
+        connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://identitytoolkit.googleapis.com;
+        manifest-src 'self';
+        worker-src 'self';
+    ">
+    
+    <title>크레스티드 게코 브리딩 시스템 | 실시간 동기화 지원</title>
     
     <!-- Icons -->
     <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192x192.png">
     <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
     
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://cdn.jsdelivr.net">
-    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- 외부 리소스 최적화 -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="dns-prefetch" href="https://www.gstatic.com">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    
+    <!-- 폰트 및 스타일 -->
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" rel="stylesheet" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com" crossorigin="anonymous"></script>
     
     <style>
         :root {
@@ -758,31 +788,57 @@
     
     <!-- 전역 오류 핸들러 -->
     <script>
-        // 전역 에러 처리 개선
+        // 향상된 전역 에러 처리
+        const errorReports = [];
+        const MAX_ERROR_REPORTS = 10;
+        
+        function logError(error, context = 'unknown') {
+            const errorInfo = {
+                message: error.message || 'Unknown error',
+                stack: error.stack || 'No stack trace',
+                context: context,
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                url: window.location.href
+            };
+            
+            // 에러 큐 관리
+            errorReports.push(errorInfo);
+            if (errorReports.length > MAX_ERROR_REPORTS) {
+                errorReports.shift();
+            }
+            
+            console.error(`[${context}] 오류:`, errorInfo);
+            
+            // 심각한 오류의 경우 사용자에게 알림
+            const criticalErrors = ['QuotaExceededError', 'SecurityError', 'NetworkError'];
+            if (criticalErrors.some(err => error.message?.includes(err))) {
+                if (typeof window.showToast === 'function') {
+                    window.showToast('시스템 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', 'error');
+                }
+            }
+        }
+        
         window.addEventListener('error', function(e) {
-            // 치명적이지 않은 오류는 조용히 로그만 기록
+            // 치명적이지 않은 오류는 조용히 처리
             if (e.message && (
                 e.message.includes('Script error') ||
                 e.message.includes('Non-Error promise rejection') ||
                 e.message.includes('Loading chunk') ||
-                e.message.includes('Loading CSS chunk')
+                e.message.includes('Loading CSS chunk') ||
+                e.message.includes('ResizeObserver loop limit exceeded')
             )) {
-                console.warn('외부 리소스 로드 오류 (무시됨):', e.message);
+                console.warn('외부 리소스 오류 (무시됨):', e.message);
                 return;
             }
             
-            console.error('전역 오류:', {
+            logError({
                 message: e.message,
+                stack: e.error?.stack,
                 filename: e.filename,
                 lineno: e.lineno,
-                colno: e.colno,
-                stack: e.error?.stack
-            });
-            
-            // 개발 모드에서만 알림 표시
-            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                console.log('개발 모드: 오류 발생 -', e.message);
-            }
+                colno: e.colno
+            }, 'global-error');
         });
         
         // Promise 에러 처리 개선

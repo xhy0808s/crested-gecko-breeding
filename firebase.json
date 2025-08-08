@@ -8,12 +8,8 @@
     ],
     "rewrites": [
       {
-        "source": "/",
+        "source": "**",
         "destination": "/index.html"
-      },
-      {
-        "source": "/mobile",
-        "destination": "/mobile-optimized.html"
       }
     ],
     "headers": [

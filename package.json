@@ -1,20 +1,32 @@
 {
   "name": "crested-gecko-breeding",
-  "version": "1.0.0",
-  "description": "크레스티드 게코 브리딩 관리 시스템",
+  "version": "3.0.0",
+  "description": "실시간 동기화 지원 크레스티드 게코 브리딩 관리 시스템",
   "main": "index.html",
   "scripts": {
     "start": "python3 -m http.server 8000",
-    "dev": "python3 -m http.server 8000"
+    "dev": "python3 -m http.server 8000",
+    "serve": "npx serve .",
+    "build": "echo 'No build step required for static PWA'",
+    "test": "echo 'Testing via browser console logs'",
+    "deploy": "echo 'Deployed via GitHub Actions'"
   },
   "keywords": [
     "gecko",
     "breeding",
-    "management"
+    "management",
+    "pwa",
+    "firebase",
+    "realtime-sync"
   ],
-  "author": "개발자",
+  "author": "크레스티드 게코 브리더",
   "license": "MIT",
-  "dependencies": {
-    "anthropic-ai": "^0.0.10"
+  "homepage": "https://xhy0808s.github.io/crested-gecko-breeding/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xhy0808s/crested-gecko-breeding.git"
+  },
+  "bugs": {
+    "url": "https://github.com/xhy0808s/crested-gecko-breeding/issues"
   }
 }

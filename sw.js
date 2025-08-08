@@ -1,3 +1,5 @@
+'use strict';
+
 const CACHE_NAME = 'gecko-breeding-v3.0.0';
 const urlsToCache = [
   './',
