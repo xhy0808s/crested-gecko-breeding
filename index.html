@@ -2,48 +2,428 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🦎 크레스티드 게코 브리딩 시스템</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>크레스티드 게코 브리딩 시스템</title>
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#1565C0">
+    
+    <!-- Icons -->
+    <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-        body { font-family: 'Noto Sans KR', sans-serif; }
-        .card-hover { transition: all 0.3s ease; }
-        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-  </style>
+    
+    <style>
+        :root {
+            /* 토스 스타일 색상 시스템 */
+            --primary-50: #e3f2fd;
+            --primary-100: #bbdefb;
+            --primary-200: #90caf9;
+            --primary-300: #64b5f6;
+            --primary-400: #42a5f5;
+            --primary-500: #2196f3;
+            --primary-600: #1e88e5;
+            --primary-700: #1976d2;
+            --primary-800: #1565c0;
+            --primary-900: #0d47a1;
+            
+            /* 네이버 스타일 그레이 */
+            --gray-50: #fafafa;
+            --gray-100: #f5f5f5;
+            --gray-200: #eeeeee;
+            --gray-300: #e0e0e0;
+            --gray-400: #bdbdbd;
+            --gray-500: #9e9e9e;
+            --gray-600: #757575;
+            --gray-700: #424242;
+            --gray-800: #212121;
+            --gray-900: #000000;
+            
+            /* 카카오 스타일 컬러 */
+            --success: #00c853;
+            --warning: #ff9800;
+            --error: #f44336;
+            --info: #2196f3;
+            
+            /* 디자인 시스템 */
+            --border-radius: 12px;
+            --border-radius-lg: 16px;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-lg: 0 4px 20px rgba(0,0,0,0.15);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fafafa;
+            color: var(--gray-800);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* 카드 시스템 - 토스/네이버 스타일 */
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-1px);
+            border-color: var(--gray-300);
+        }
+
+        .card-clickable:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+            border-color: var(--primary-200);
+            cursor: pointer;
+        }
+
+        /* 헤더 */
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 40;
+        }
+
+        /* 통계 카드 */
+        .stat-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.25rem;
+            border: 1px solid var(--gray-200);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-value {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+
+        /* 기능 카드 - 모바일 터치 최적화 */
+        .feature-card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .feature-card:hover, .feature-card:focus {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-200);
+            outline: none;
+        }
+        
+        .feature-card:active {
+            transform: translateY(0);
+            box-shadow: var(--shadow);
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1);
+        }
+        
+        /* 터치 디바이스에서 호버 효과 개선 */
+        @media (hover: none) and (pointer: coarse) {
+            .feature-card:hover {
+                transform: none;
+            }
+            
+            .feature-card:active {
+                transform: translateY(1px);
+                background-color: var(--gray-50);
+            }
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            transition: var(--transition);
+        }
+
+        .feature-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.25rem;
+        }
+
+        .feature-description {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        /* 버튼 - 터치 친화적 */
+        .btn-primary {
+            background-color: var(--primary-600);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: var(--transition);
+            min-height: 44px; /* iOS 터치 타겟 권장 크기 */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-700);
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-secondary {
+            background-color: var(--gray-100);
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: var(--transition);
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--gray-200);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary:active {
+            transform: translateY(0);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* 토스트 알림 - 모바일 최적화 */
+        .toast {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            left: 1rem;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            padding: 1rem;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: var(--transition);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        @media (min-width: 640px) {
+            .toast {
+                left: auto;
+                max-width: 20rem;
+            }
+        }
+
+        /* 모달 - 모바일 최적화 */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+            max-width: 100vw;
+            max-height: 95vh;
+            overflow-y: auto;
+            width: 100%;
+            margin: 0.5rem;
+        }
+        
+        @media (min-width: 640px) {
+            .modal-content {
+                max-width: 90vw;
+                width: auto;
+                margin: 1rem;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .modal-content {
+                max-width: 600px;
+            }
+        }
+
+        /* 폼 요소 */
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+        }
+
+        /* 반응형 그리드 */
+        .grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+        .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        .grid-cols-7 { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+
+        @media (min-width: 640px) {
+            .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .sm\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .sm\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        }
+
+        @media (min-width: 768px) {
+            .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .md\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+            .md\:grid-cols-7 { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+        }
+
+        @media (min-width: 1024px) {
+            .lg\:grid-cols-7 { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+        }
+
+        /* 유틸리티 클래스 */
+        .text-center { text-align: center; }
+        .font-semibold { font-weight: 600; }
+        .font-bold { font-weight: 700; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        .p-4 { padding: 1rem; }
+        .p-6 { padding: 1.5rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .hidden { display: none; }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .space-x-2 > * + * { margin-left: 0.5rem; }
+        .space-x-4 > * + * { margin-left: 1rem; }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-green-50 to-blue-50 min-h-screen">
+<body>
     <!-- 헤더 -->
-    <header class="bg-white shadow-sm border-b">
+    <header class="header">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center py-4">
-                <div class="flex items-center space-x-3">
-                    <i class="fas fa-dragon text-2xl text-green-600"></i>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl">
+                        <i class="fas fa-dragon text-white text-xl"></i>
+                    </div>
                     <h1 class="text-xl font-bold text-gray-900">크레스티드 게코 브리딩 시스템</h1>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <div id="userInfo">
+                    <div id="userInfo" class="hidden sm:block">
                         <!-- 사용자 정보가 여기에 표시됩니다 -->
                     </div>
-                    <div id="syncStatus" class="text-sm">
+                    <div id="syncStatus" class="text-xs sm:text-sm hidden sm:block">
                         <span class="text-gray-600">
                             ⏳ 동기화 준비중
                         </span>
                     </div>
                     <div class="flex space-x-2">
-                        <button onclick="manualSync()" class="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700">
+                        <!-- PWA 설치 버튼 -->
+                        <button id="pwaInstallBtn" onclick="installPWA()" class="btn-primary hidden">
+                            <i class="fas fa-download mr-1"></i>앱 설치
+                        </button>
+                        <button onclick="manualSync()" class="btn-primary">
                             <i class="fas fa-sync mr-1"></i>동기화
                         </button>
                         <div class="relative">
-                            <button onclick="toggleUserMenu()" class="px-3 py-1 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700">
+                            <button onclick="toggleUserMenu()" class="btn-secondary">
                                 <i class="fas fa-user mr-1"></i>설정
                             </button>
                             <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-                                <button onclick="window.userAuth.changeUser()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <button onclick="changeUser()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                     <i class="fas fa-user-switch mr-2"></i>사용자 변경
                                 </button>
-                                <button onclick="window.userAuth.logout()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <button onclick="logout()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                     <i class="fas fa-sign-out-alt mr-2"></i>로그아웃
                                 </button>
                             </div>
@@ -55,114 +435,422 @@
     </header>
 
     <!-- 메인 컨텐츠 -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- 통계 카드 -->
-        <div class="grid grid-cols-2 md:grid-cols-7 gap-4 mb-8">
-            <div class="bg-white rounded-lg shadow-md p-4 text-center">
-                <i class="fas fa-dragon text-2xl text-green-600 mb-2"></i>
-                <h3 class="text-lg font-semibold text-gray-900">총 개체</h3>
-                <p class="text-2xl font-bold text-green-600" id="totalAnimals">0</p>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-4 text-center">
-                <i class="fas fa-seedling text-2xl text-blue-600 mb-2"></i>
-                <h3 class="text-lg font-semibold text-gray-900">F1 세대</h3>
-                <p class="text-2xl font-bold text-blue-600" id="f1Count">0</p>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-4 text-center">
-                <i class="fas fa-leaf text-2xl text-yellow-600 mb-2"></i>
-                <h3 class="text-lg font-semibold text-gray-900">F2 세대</h3>
-                <p class="text-2xl font-bold text-yellow-600" id="f2Count">0</p>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-4 text-center">
-                <i class="fas fa-tree text-2xl text-purple-600 mb-2"></i>
-                <h3 class="text-lg font-semibold text-gray-900">F3 세대</h3>
-                <p class="text-2xl font-bold text-purple-600" id="f3Count">0</p>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-4 text-center">
-                <i class="fas fa-seedling text-2xl text-indigo-600 mb-2"></i>
-                <h3 class="text-lg font-semibold text-gray-900">F4+ 세대</h3>
-                <p class="text-2xl font-bold text-indigo-600" id="f4PlusCount">0</p>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-4 text-center">
-                <i class="fas fa-baby text-2xl text-pink-600 mb-2"></i>
-                <h3 class="text-lg font-semibold text-gray-900">베이비</h3>
-                <p class="text-2xl font-bold text-pink-600" id="babyCount">0</p>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-4 text-center">
-                <i class="fas fa-handshake text-2xl text-blue-600 mb-2"></i>
-                <h3 class="text-lg font-semibold text-gray-900">분양 완료</h3>
-                <p class="text-2xl font-bold text-blue-600" id="soldCount">0</p>
-            </div>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- 산란 알림 대시보드 -->
+        <div id="breedingAlerts" class="mb-8 hidden">
+            <!-- 산란 알림이 여기에 표시됩니다 -->
         </div>
 
-        <!-- 메인 기능 버튼들 -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
-            <button onclick="showAnimalRegistrationModal()" class="card-hover bg-white rounded-xl shadow-lg p-6 text-center border border-gray-200">
-                <i class="fas fa-plus-circle text-4xl text-green-600 mb-4"></i>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">개체 등록</h3>
-                <p class="text-sm text-gray-600">새로운 개체를 등록합니다</p>
-            </button>
-            
-            <button onclick="showAnimalListModal()" class="card-hover bg-white rounded-xl shadow-lg p-6 text-center border border-gray-200">
-                <i class="fas fa-list text-4xl text-blue-600 mb-4"></i>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">개체 목록</h3>
-                <p class="text-sm text-gray-600">등록된 개체들을 확인합니다</p>
-            </button>
-            
-            <button onclick="showBabyModal()" class="card-hover bg-white rounded-xl shadow-lg p-6 text-center border border-gray-200">
-                <i class="fas fa-baby text-4xl text-pink-600 mb-4"></i>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">베이비 등록</h3>
-                <p class="text-sm text-gray-600">새로 태어난 베이비를 등록합니다</p>
-            </button>
-            
-            <button onclick="showBabyListModal()" class="card-hover bg-white rounded-xl shadow-lg p-6 text-center border border-gray-200">
-                <i class="fas fa-heart text-4xl text-red-600 mb-4"></i>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">베이비 목록</h3>
-                <p class="text-sm text-gray-600">베이비들을 확인합니다</p>
-            </button>
-            
-            <button onclick="showSoldListModal()" class="card-hover bg-white rounded-xl shadow-lg p-6 text-center border border-gray-200">
-                <i class="fas fa-handshake text-4xl text-blue-600 mb-4"></i>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">분양 완료</h3>
-                <p class="text-sm text-gray-600">분양 완료된 개체들을 확인합니다</p>
-            </button>
-            
-            <button onclick="showBulkImportModal()" class="card-hover bg-white rounded-xl shadow-lg p-6 text-center border border-gray-200">
-                <i class="fas fa-file-import text-4xl text-purple-600 mb-4"></i>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">대량 가져오기</h3>
-                <p class="text-sm text-gray-600">Excel/CSV 파일로 한번에 많은 개체를 등록합니다</p>
-            </button>
-        </div>
+        <!-- 통계 대시보드 -->
+        <section class="mb-8">
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
+                <div class="stat-card text-center">
+                    <div class="flex items-center justify-center w-12 h-12 bg-green-100 rounded-xl mx-auto mb-3">
+                        <i class="fas fa-dragon text-green-600 text-xl"></i>
+                    </div>
+                    <div class="stat-value" id="totalAnimals">0</div>
+                    <div class="stat-label">총 개체</div>
+                </div>
+                <div class="stat-card text-center">
+                    <div class="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-xl mx-auto mb-3">
+                        <i class="fas fa-seedling text-blue-600 text-xl"></i>
+                    </div>
+                    <div class="stat-value" id="f1Count">0</div>
+                    <div class="stat-label">F1 세대</div>
+                </div>
+                <div class="stat-card text-center">
+                    <div class="flex items-center justify-center w-12 h-12 bg-yellow-100 rounded-xl mx-auto mb-3">
+                        <i class="fas fa-leaf text-yellow-600 text-xl"></i>
+                    </div>
+                    <div class="stat-value" id="f2Count">0</div>
+                    <div class="stat-label">F2 세대</div>
+                </div>
+                <div class="stat-card text-center">
+                    <div class="flex items-center justify-center w-12 h-12 bg-purple-100 rounded-xl mx-auto mb-3">
+                        <i class="fas fa-tree text-purple-600 text-xl"></i>
+                    </div>
+                    <div class="stat-value" id="f3Count">0</div>
+                    <div class="stat-label">F3 세대</div>
+                </div>
+                <div class="stat-card text-center">
+                    <div class="flex items-center justify-center w-12 h-12 bg-indigo-100 rounded-xl mx-auto mb-3">
+                        <i class="fas fa-seedling text-indigo-600 text-xl"></i>
+                    </div>
+                    <div class="stat-value" id="f4PlusCount">0</div>
+                    <div class="stat-label">F4+ 세대</div>
+                </div>
+                <div class="stat-card text-center">
+                    <div class="flex items-center justify-center w-12 h-12 bg-pink-100 rounded-xl mx-auto mb-3">
+                        <i class="fas fa-baby text-pink-600 text-xl"></i>
+                    </div>
+                    <div class="stat-value" id="babyCount">0</div>
+                    <div class="stat-label">베이비</div>
+                </div>
+                <div class="stat-card text-center">
+                    <div class="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-xl mx-auto mb-3">
+                        <i class="fas fa-handshake text-blue-600 text-xl"></i>
+                    </div>
+                    <div class="stat-value" id="soldCount">0</div>
+                    <div class="stat-label">분양 완료</div>
+                </div>
+            </div>
+        </section>
 
-        <!-- 추가 기능 버튼들 -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <button onclick="showMorphCalculatorModal()" class="card-hover bg-white rounded-xl shadow-lg p-6 text-center border border-gray-200">
-                <i class="fas fa-calculator text-4xl text-purple-600 mb-4"></i>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">모프 계산기</h3>
-                <p class="text-sm text-gray-600">모프 조합을 계산합니다</p>
-            </button>
-            
-            <button onclick="showFamilyTreeModal()" class="card-hover bg-white rounded-xl shadow-lg p-6 text-center border border-gray-200">
-                <i class="fas fa-sitemap text-4xl text-teal-600 mb-4"></i>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">혈통 트리</h3>
-                <p class="text-sm text-gray-600">혈통 관계를 확인합니다</p>
-            </button>
-        </div>
+        <!-- 주요 기능 -->
+        <section class="mb-8">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">주요 기능</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <button onclick="showAnimalRegistrationModal()" class="feature-card">
+                    <div class="feature-icon text-green-600">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <div class="feature-title">개체 등록</div>
+                    <div class="feature-description">새로운 개체 등록</div>
+                </button>
+                
+                <button onclick="showAnimalListModal()" class="feature-card">
+                    <div class="feature-icon text-blue-600">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <div class="feature-title">개체 목록</div>
+                    <div class="feature-description">등록된 개체 관리</div>
+                </button>
+                
+                <button onclick="showBabyModal()" class="feature-card">
+                    <div class="feature-icon text-pink-600">
+                        <i class="fas fa-baby"></i>
+                    </div>
+                    <div class="feature-title">베이비 등록</div>
+                    <div class="feature-description">새 베이비 등록</div>
+                </button>
+                
+                <button onclick="showBabyListModal()" class="feature-card">
+                    <div class="feature-icon text-red-600">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="feature-title">베이비 목록</div>
+                    <div class="feature-description">베이비 관리</div>
+                </button>
+                
+                <button onclick="showSoldListModal()" class="feature-card">
+                    <div class="feature-icon text-blue-600">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <div class="feature-title">분양 완료</div>
+                    <div class="feature-description">분양 완료 목록</div>
+                </button>
+                
+                <button onclick="showBulkImportModal()" class="feature-card">
+                    <div class="feature-icon text-purple-600">
+                        <i class="fas fa-file-import"></i>
+                    </div>
+                    <div class="feature-title">대량 가져오기</div>
+                    <div class="feature-description">CSV/Excel 가져오기</div>
+                </button>
+            </div>
+        </section>
+
+        <!-- 고급 기능 -->
+        <section class="mb-8">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">고급 기능</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button onclick="showMorphCalculatorModal()" class="feature-card">
+                    <div class="feature-icon text-purple-600">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <div class="feature-title">모프 계산기</div>
+                    <div class="feature-description">유전 조합 예측</div>
+                </button>
+                
+                <button onclick="showFamilyTreeModal()" class="feature-card">
+                    <div class="feature-icon text-teal-600">
+                        <i class="fas fa-sitemap"></i>
+                    </div>
+                    <div class="feature-title">혈통 트리</div>
+                    <div class="feature-description">혈통 관계 조회</div>
+                </button>
+                
+                <button onclick="showHealthManagementModal()" class="feature-card">
+                    <div class="feature-icon text-red-600">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <div class="feature-title">건강 관리</div>
+                    <div class="feature-description">건강 기록 관리</div>
+                </button>
+            </div>
+        </section>
     </main>
 
-    <!-- 모달 오버레이 -->
-    <div id="modalOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50" onclick="closeModal()">
-        <div class="flex items-center justify-center min-h-screen p-4" onclick="event.stopPropagation()">
-            <div id="modalContent" class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                <!-- 모달 내용이 여기에 동적으로 삽입됩니다 -->
-            </div>
+    <!-- 모달 -->
+    <div id="modalOverlay" class="hidden modal-overlay">
+        <div id="modalContent" class="modal-content relative">
+            <!-- 닫기 버튼 -->
+            <button onclick="closeModal()" class="absolute top-4 right-4 z-10 w-8 h-8 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center text-gray-600 hover:text-gray-800 transition-colors">
+                <i class="fas fa-times"></i>
+            </button>
+            <!-- 모달 내용이 여기에 동적으로 삽입됩니다 -->
         </div>
     </div>
+    
+    <!-- ESC 키 및 클릭으로 모달 닫기 -->
+    <script>
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+        
+        document.getElementById('modalOverlay').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeModal();
+            }
+        });
+    </script>
 
-    <script type="module" src="firebaseConfig.js"></script>
-    <script src="user-auth.js"></script>
+    <!-- Firebase SDK v9 (최신 모듈 방식) -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, enableNetwork, disableNetwork } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+        import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+        // Firebase 설정
+        const firebaseConfig = {
+            apiKey: "AIzaSyDD5ZpR5fk70tmcKXB09FEj5g6LeZb1-Zc",
+            authDomain: "crested-gecko-breeding.firebaseapp.com",
+            projectId: "crested-gecko-breeding",
+            storageBucket: "crested-gecko-breeding.firebasestorage.app",
+            messagingSenderId: "12684495107",
+            appId: "1:12684495107:web:289489c1a456db8b134136"
+        };
+
+        // Firebase 초기화
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+        const auth = getAuth(app);
+
+        // 전역으로 내보내기
+        window.db = db;
+        window.firebaseStorage = storage;
+        window.auth = auth;
+        window.firebaseImports = {
+            doc, setDoc, getDoc, onSnapshot, collection,
+            ref, uploadBytes, getDownloadURL,
+            signInAnonymously, onAuthStateChanged,
+            enableNetwork, disableNetwork
+        };
+
+        // 익명 인증 (에러 처리 개선)
+        signInAnonymously(auth).then((result) => {
+            window.currentUserId = result.user.uid;
+            console.log('🔐 익명 로그인 완료:', window.currentUserId);
+            
+            // Firebase 준비 완료 이벤트 발생
+            setTimeout(() => {
+                window.dispatchEvent(new CustomEvent('firebaseReady'));
+            }, 500);
+            
+            // 사용자 정보 UI 업데이트
+            updateUserInfo(result.user.uid);
+            
+        }).catch((error) => {
+            console.warn('Firebase 인증 실패, 오프라인 모드로 전환:', error.message);
+            // 오프라인 모드로 전환
+            window.currentUserId = 'offline_' + Date.now();
+            setTimeout(() => {
+                window.dispatchEvent(new CustomEvent('firebaseReady'));
+            }, 500);
+            
+            // 오프라인 모드 사용자 정보
+            const userInfoElement = document.getElementById('userInfo');
+            if (userInfoElement) {
+                userInfoElement.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
+                        <span class="text-sm text-gray-600">오프라인 모드</span>
+                    </div>
+                `;
+            }
+        });
+
+        function updateUserInfo(userId) {
+            const userInfoElement = document.getElementById('userInfo');
+            if (userInfoElement) {
+                const shortId = userId.substring(0, 8);
+                userInfoElement.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        <span class="text-sm text-gray-600">사용자: ${shortId}</span>
+                    </div>
+                `;
+            }
+        }
+        
+        // 전역 함수 정의
+        window.changeUser = function() {
+            if (window.userAuth && typeof window.userAuth.changeUser === 'function') {
+                window.userAuth.changeUser();
+            } else {
+                console.warn('사용자 인증 시스템을 찾을 수 없습니다.');
+                alert('사용자 인증 시스템이 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
+            }
+        };
+        
+        window.logout = function() {
+            if (window.userAuth && typeof window.userAuth.logout === 'function') {
+                window.userAuth.logout();
+            } else {
+                console.warn('사용자 인증 시스템을 찾을 수 없습니다.');
+                alert('사용자 인증 시스템이 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
+            }
+        };
+        
+        window.toggleUserMenu = function() {
+            const menu = document.getElementById('userMenu');
+            if (menu) {
+                menu.classList.toggle('hidden');
+            }
+        };
+    </script>
+    
+    <!-- 전역 오류 핸들러 -->
+    <script>
+        // 전역 에러 처리 개선
+        window.addEventListener('error', function(e) {
+            // 치명적이지 않은 오류는 조용히 로그만 기록
+            if (e.message && (
+                e.message.includes('Script error') ||
+                e.message.includes('Non-Error promise rejection') ||
+                e.message.includes('Loading chunk') ||
+                e.message.includes('Loading CSS chunk')
+            )) {
+                console.warn('외부 리소스 로드 오류 (무시됨):', e.message);
+                return;
+            }
+            
+            console.error('전역 오류:', {
+                message: e.message,
+                filename: e.filename,
+                lineno: e.lineno,
+                colno: e.colno,
+                stack: e.error?.stack
+            });
+            
+            // 개발 모드에서만 알림 표시
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                console.log('개발 모드: 오류 발생 -', e.message);
+            }
+        });
+        
+        // Promise 에러 처리 개선
+        window.addEventListener('unhandledrejection', function(e) {
+            // Firebase나 외부 라이브러리 오류는 조용히 처리
+            const reason = e.reason?.toString() || '';
+            if (reason.includes('firebase') || 
+                reason.includes('Network Error') || 
+                reason.includes('Failed to fetch')) {
+                console.warn('외부 서비스 연결 오류 (무시됨):', reason);
+                e.preventDefault();
+                return;
+            }
+            
+            console.error('처리되지 않은 Promise 오류:', e.reason);
+            e.preventDefault();
+        });
+        
+        // PWA 설치 관리
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // 기본 설치 프롬프트 방지
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // 설치 버튼 표시
+            const installBtn = document.getElementById('pwaInstallBtn');
+            if (installBtn) {
+                installBtn.classList.remove('hidden');
+            }
+        });
+        
+        window.installPWA = function() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('📱 PWA 설치됨');
+                        // 토스트 알림
+                        showToast('앱이 설치되었습니다! 홈 화면에서 확인해보세요.', 'success');
+                    } else {
+                        console.log('❌ PWA 설치 취소됨');
+                    }
+                    deferredPrompt = null;
+                    document.getElementById('pwaInstallBtn').classList.add('hidden');
+                });
+            }
+        };
+        
+        // 앱 설치 완료 시
+        window.addEventListener('appinstalled', (e) => {
+            console.log('✅ PWA 설치 완료');
+            showToast('앱이 성공적으로 설치되었습니다!', 'success');
+            document.getElementById('pwaInstallBtn').classList.add('hidden');
+        });
+        
+        // 리소스 로드 완료 확인
+        window.addEventListener('load', function() {
+            console.log('🚀 페이지 로드 완료');
+            
+            // Service Worker 등록 (에러 무시)
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('SW 등록 성공:', registration.scope);
+                        
+                        // 업데이트 확인
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    showToast('새 업데이트가 있습니다. 페이지를 새로고침하세요.', 'info');
+                                }
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.warn('SW 등록 실패 (계속 진행):', error.message);
+                    });
+            }
+        });
+        
+        // DOM 준비 완료 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎉 DOM 준비 완료');
+            
+            // 통계 업데이트 함수 확인 및 실행
+            const initializeStats = () => {
+                if (typeof window.updateStatistics === 'function') {
+                    try {
+                        window.updateStatistics();
+                        console.log('✅ 초기 통계 업데이트 완료');
+                    } catch (error) {
+                        console.warn('통계 업데이트 실패:', error.message);
+                    }
+                } else {
+                    console.log('⏳ updateStatistics 함수 대기 중...');
+                    setTimeout(initializeStats, 1000);
+                }
+            };
+            
+            // 지연 실행으로 스크립트 로드 대기
+            setTimeout(initializeStats, 500);
+        });
+    </script>
+    
     <script src="firebase-sync.js"></script>
     <script src="bulk-import.js"></script>
+    <script src="user-auth.js"></script>
     <script src="script.js"></script>
     
     <script>
@@ -180,13 +868,13 @@
                     
                     <form class="space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">개체 이름 *</label>
-                            <input type="text" id="animalName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" required>
+                            <label class="form-label">개체 이름 *</label>
+                            <input type="text" id="animalName" class="form-input" required>
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">성별 *</label>
-                            <select id="animalGender" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" required>
+                            <label class="form-label">성별 *</label>
+                            <select id="animalGender" class="form-input" required>
                                 <option value="">선택하세요</option>
                                 <option value="수컷">수컷</option>
                                 <option value="암컷">암컷</option>
@@ -194,8 +882,8 @@
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">세대 *</label>
-                            <select id="animalGeneration" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" required>
+                            <label class="form-label">세대 *</label>
+                            <select id="animalGeneration" class="form-input" required>
                                 <option value="">선택하세요</option>
                                 <option value="F1">F1</option>
                                 <option value="F2">F2</option>
@@ -206,11 +894,10 @@
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">모프</label>
+                            <label class="form-label">모프</label>
                             <div class="relative">
                                 <input type="text" id="animalMorphSearch" placeholder="모프 검색 또는 선택..." 
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                                       autocomplete="off">
+                                       class="form-input" autocomplete="off">
                                 <div id="animalMorphDropdown" class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden">
                                     <div class="p-2 border-b border-gray-200">
                                         <div class="text-xs font-semibold text-gray-500 mb-2">인기 모프</div>
@@ -272,8 +959,8 @@
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">이미지</label>
-                            <input type="file" id="animalImage" accept="image/*" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                            <label class="form-label">이미지</label>
+                            <input type="file" id="animalImage" accept="image/*" class="form-input">
                         </div>
                         
                         <div class="flex justify-end space-x-3 pt-4">
@@ -287,7 +974,7 @@
                     </form>
                 </div>
             `;
-            document.getElementById('modalOverlay').classList.remove('hidden');
+            openModal();
         }
 
         function showAnimalListModal() {
@@ -306,11 +993,17 @@
                     </div>
                 </div>
             `;
-            document.getElementById('modalOverlay').classList.remove('hidden');
+            openModal();
             
             // 모프 검색 기능 초기화
-            initializeMorphSearch('animalMorphSearch', 'animalMorphDropdown', 'animalMorph');
-            loadAnimalList();
+            setTimeout(() => {
+                if (typeof initializeMorphSearch === 'function') {
+                    initializeMorphSearch('animalMorphSearch', 'animalMorphDropdown', 'animalMorph');
+                }
+                if (typeof loadAnimalList === 'function') {
+                    loadAnimalList();
+                }
+            }, 100);
         }
 
         function showBabyModal() {
@@ -351,8 +1044,8 @@
                     
                     <form class="space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">성별 *</label>
-                            <select id="babyGender" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent" required>
+                            <label class="form-label">성별 *</label>
+                            <select id="babyGender" class="form-input" required>
                                 <option value="">선택하세요</option>
                                 <option value="미구분">미구분</option>
                                 <option value="수컷">수컷</option>
@@ -363,11 +1056,10 @@
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">모프</label>
+                            <label class="form-label">모프</label>
                             <div class="relative">
                                 <input type="text" id="babyMorphSearch" placeholder="모프 검색 또는 선택..." 
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                                       autocomplete="off">
+                                       class="form-input" autocomplete="off">
                                 <div id="babyMorphDropdown" class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden">
                                     <div class="p-2 border-b border-gray-200">
                                         <div class="text-xs font-semibold text-gray-500 mb-2">인기 모프</div>
@@ -431,34 +1123,34 @@
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">예상 세대 (자동 계산)</label>
-                            <input type="text" id="babyGeneration" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50" placeholder="부모를 선택하면 자동으로 계산됩니다" readonly>
+                            <label class="form-label">예상 세대 (자동 계산)</label>
+                            <input type="text" id="babyGeneration" class="form-input bg-gray-50" placeholder="부모를 선택하면 자동으로 계산됩니다" readonly>
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">부개체 (수컷) *</label>
-                            <select id="babyParent1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent" required>
+                            <label class="form-label">부개체 (수컷) *</label>
+                            <select id="babyParent1" class="form-input" required>
                                 ${maleOptions}
                             </select>
                             ${maleAnimals.length === 0 ? '<p class="text-xs text-red-600 mt-1">등록된 수컷 개체가 없습니다. 먼저 개체를 등록해주세요.</p>' : ''}
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">모개체 (암컷) *</label>
-                            <select id="babyParent2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent" required>
+                            <label class="form-label">모개체 (암컷) *</label>
+                            <select id="babyParent2" class="form-input" required>
                                 ${femaleOptions}
                             </select>
                             ${femaleAnimals.length === 0 ? '<p class="text-xs text-red-600 mt-1">등록된 암컷 개체가 없습니다. 먼저 개체를 등록해주세요.</p>' : ''}
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">태어난 날짜 *</label>
-                            <input type="date" id="babyBirthDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent" required>
+                            <label class="form-label">태어난 날짜 *</label>
+                            <input type="date" id="babyBirthDate" class="form-input" required>
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">이미지</label>
-                            <input type="file" id="babyImage" accept="image/*" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent">
+                            <label class="form-label">이미지</label>
+                            <input type="file" id="babyImage" accept="image/*" class="form-input">
                         </div>
                         
                         <div class="flex justify-end space-x-3 pt-4">
@@ -472,7 +1164,7 @@
                     </form>
                 </div>
             `;
-            document.getElementById('modalOverlay').classList.remove('hidden');
+            openModal();
             
             // 부모 선택 시 세대 자동 계산
             function updateBabyGeneration() {
@@ -527,71 +1219,116 @@
                     </div>
                 </div>
             `;
-            document.getElementById('modalOverlay').classList.remove('hidden');
+            openModal();
             loadBabyList();
         }
 
         function showMorphCalculatorModal() {
+            const animals = getAllAnimals();
+            const activeAnimals = animals.filter(a => a.status === '활성');
+            
+            let maleOptions = '<option value="">직접 선택 또는 등록된 개체 선택</option>';
+            let femaleOptions = '<option value="">직접 선택 또는 등록된 개체 선택</option>';
+            
+            activeAnimals.forEach(animal => {
+                if (animal.gender === '수컷' && animal.morph) {
+                    maleOptions += `<option value="${animal.morph}">${animal.name} (${animal.morph})</option>`;
+                }
+                if (animal.gender === '암컷' && animal.morph) {
+                    femaleOptions += `<option value="${animal.morph}">${animal.name} (${animal.morph})</option>`;
+                }
+            });
+            
             const modalContent = document.getElementById('modalContent');
             modalContent.innerHTML = `
-                <div class="p-6">
+                <div class="p-6 max-w-4xl">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-bold text-gray-900"><i class="fas fa-calculator mr-2"></i>모프 계산기</h2>
+                        <h2 class="text-xl font-bold text-gray-900"><i class="fas fa-calculator mr-2"></i>고급 모프 계산기</h2>
                         <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
                             <i class="fas fa-times text-xl"></i>
                         </button>
                     </div>
                     
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">부개체 모프</label>
-                            <select id="fatherMorphs" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                                <option value="">선택하세요</option>
-                                <option value="Normal">Normal</option>
-                                <option value="Super Dalmatian">Super Dalmatian</option>
-                                <option value="Lily White">Lily White</option>
-                                <option value="Pinstripe">Pinstripe</option>
-                                <option value="Harlequin">Harlequin</option>
-                                <option value="Tremper Albino">Tremper Albino</option>
-                                <option value="Bell Albino">Bell Albino</option>
-                                <option value="Creamsicle">Creamsicle</option>
-                            </select>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- 부모 선택 -->
+                        <div class="space-y-4">
+                            <div>
+                                <label class="form-label">부개체 (수컷)</label>
+                                <select id="fatherMorphs" onchange="updateMorphDisplay('father')" class="form-input">
+                                    ${maleOptions}
+                                    <optgroup label="직접 선택">
+                                        <option value="노멀">노멀</option>
+                                        <option value="릴리화이트">릴리화이트</option>
+                                        <option value="달마시안">달마시안</option>
+                                        <option value="슈퍼달마시안">슈퍼달마시안</option>
+                                        <option value="할리퀸">할리퀸</option>
+                                        <option value="핀스트라이프">핀스트라이프</option>
+                                        <option value="팬텀">팬텀</option>
+                                        <option value="세이블">세이블</option>
+                                    </optgroup>
+                                </select>
+                                <div id="fatherMorphDisplay" class="mt-2 p-2 bg-blue-50 rounded text-sm text-blue-800 hidden">
+                                    <!-- 선택된 모프 정보 표시 -->
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="form-label">모개체 (암컷)</label>
+                                <select id="motherMorphs" onchange="updateMorphDisplay('mother')" class="form-input">
+                                    ${femaleOptions}
+                                    <optgroup label="직접 선택">
+                                        <option value="노멀">노멀</option>
+                                        <option value="릴리화이트">릴리화이트</option>
+                                        <option value="달마시안">달마시안</option>
+                                        <option value="슈퍼달마시안">슈퍼달마시안</option>
+                                        <option value="할리퀸">할리퀸</option>
+                                        <option value="핀스트라이프">핀스트라이프</option>
+                                        <option value="팬텀">팬텀</option>
+                                        <option value="세이블">세이블</option>
+                                    </optgroup>
+                                </select>
+                                <div id="motherMorphDisplay" class="mt-2 p-2 bg-pink-50 rounded text-sm text-pink-800 hidden">
+                                    <!-- 선택된 모프 정보 표시 -->
+                                </div>
+                            </div>
+                            
+                            <button type="button" onclick="calculateAdvancedMorphs()" class="btn-primary w-full">
+                                <i class="fas fa-magic mr-2"></i>고급 계산하기
+                            </button>
                         </div>
                         
+                        <!-- 결과 표시 -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">모개체 모프</label>
-                            <select id="motherMorphs" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                                <option value="">선택하세요</option>
-                                <option value="Normal">Normal</option>
-                                <option value="Super Dalmatian">Super Dalmatian</option>
-                                <option value="Lily White">Lily White</option>
-                                <option value="Pinstripe">Pinstripe</option>
-                                <option value="Harlequin">Harlequin</option>
-                                <option value="Tremper Albino">Tremper Albino</option>
-                                <option value="Bell Albino">Bell Albino</option>
-                                <option value="Creamsicle">Creamsicle</option>
-                            </select>
-  </div>
-
-                        <div class="flex justify-end space-x-3 pt-4">
-                            <button type="button" onclick="closeModal()" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">
-                                취소
-                            </button>
-                            <button type="button" onclick="calculateMorphs()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
-                                계산
-                            </button>
-  </div>
-
-                        <div id="morphResults" class="mt-6 p-4 bg-gray-50 rounded-lg">
-                            <!-- 계산 결과가 여기에 표시됩니다 -->
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">예상 결과</h3>
+                            <div id="morphResults" class="space-y-3">
+                                <p class="text-gray-500 text-center py-8">부모를 선택하고 계산하기를 클릭하세요</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 모프 정보 가이드 -->
+                    <div class="mt-6 bg-gray-50 rounded-lg p-4">
+                        <h4 class="font-semibold text-gray-800 mb-2">
+                            <i class="fas fa-info-circle mr-2"></i>모프 유전 정보
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                            <div>
+                                <strong>우성 유전:</strong> 릴리화이트, 달마시안
+                            </div>
+                            <div>
+                                <strong>공우성:</strong> 할리퀸, 핀스트라이프
+                            </div>
+                            <div>
+                                <strong>열성 유전:</strong> 세이블, 루아, 부항
+                            </div>
                         </div>
                     </div>
                 </div>
             `;
-            document.getElementById('modalOverlay').classList.remove('hidden');
+            openModal();
         }
 
-                function showSoldListModal() {
+        function showSoldListModal() {
             const modalContent = document.getElementById('modalContent');
             modalContent.innerHTML = `
                 <div class="p-6">
@@ -607,7 +1344,7 @@
                     </div>
                 </div>
             `;
-            document.getElementById('modalOverlay').classList.remove('hidden');
+            openModal();
             loadSoldList();
         }
 
@@ -649,7 +1386,7 @@
                             <input type="file" id="bulkImportFile" accept=".csv,.xlsx,.xls,.json" 
                                    class="hidden" onchange="handleBulkImport(this)">
                             <button onclick="document.getElementById('bulkImportFile').click()" 
-                                    class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                                    class="btn-primary">
                                 파일 선택
                             </button>
                         </div>
@@ -663,7 +1400,7 @@
                                 아래 템플릿을 다운로드하여 데이터를 정리한 후 업로드하세요.
                             </p>
                             <button onclick="window.bulkDataManager.downloadTemplate()" 
-                                    class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700">
+                                    class="btn-primary text-sm">
                                 <i class="fas fa-file-csv mr-2"></i>CSV 템플릿 다운로드
                             </button>
                         </div>
@@ -677,7 +1414,7 @@
                                 현재 등록된 모든 데이터를 JSON 파일로 백업할 수 있습니다.
                             </p>
                             <button onclick="window.bulkDataManager.exportData()" 
-                                    class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700">
+                                    class="btn-primary text-sm">
                                 <i class="fas fa-download mr-2"></i>전체 데이터 백업
                             </button>
                         </div>
@@ -703,7 +1440,7 @@
                     </div>
                 </div>
             `;
-            document.getElementById('modalOverlay').classList.remove('hidden');
+            openModal();
         }
 
         function showFamilyTreeModal() {
@@ -724,7 +1461,88 @@
                     </div>
                 </div>
             `;
-            document.getElementById('modalOverlay').classList.remove('hidden');
+            openModal();
+        }
+
+        function showHealthManagementModal() {
+            const animals = getAllAnimals();
+            const babies = getBabies();
+            const allEntities = [...animals, ...babies];
+            
+            let entityOptions = '<option value="">개체를 선택하세요</option>';
+            allEntities.forEach(entity => {
+                const type = entity.status === '베이비' ? '베이비' : '성체';
+                entityOptions += `<option value="${entity.id}">${entity.name} (${type})</option>`;
+            });
+            
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = `
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-900">
+                            <i class="fas fa-heartbeat mr-2"></i>건강 관리 시스템
+                        </h2>
+                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- 건강 상태 기록 -->
+                        <div class="bg-green-50 rounded-lg p-4">
+                            <h3 class="font-semibold text-green-800 mb-3">
+                                <i class="fas fa-plus-circle mr-2"></i>건강 기록 추가
+                            </h3>
+                            <form class="space-y-3">
+                                <select id="healthEntitySelect" class="form-input text-sm">
+                                    ${entityOptions}
+                                </select>
+                                <select id="healthType" class="form-input text-sm">
+                                    <option value="">기록 유형</option>
+                                    <option value="건강검진">정기 건강검진</option>
+                                    <option value="탈피">탈피 기록</option>
+                                    <option value="질병">질병/치료</option>
+                                    <option value="예방접종">예방접종</option>
+                                    <option value="기타">기타</option>
+                                </select>
+                                <input type="date" id="healthDate" class="form-input text-sm">
+                                <textarea id="healthNotes" placeholder="상세 내용..." class="form-input text-sm h-20 resize-none"></textarea>
+                                <button type="button" onclick="saveHealthRecord()" class="btn-primary w-full text-sm">
+                                    기록 저장
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- 건강 알림 -->
+                        <div class="bg-blue-50 rounded-lg p-4">
+                            <h3 class="font-semibold text-blue-800 mb-3">
+                                <i class="fas fa-bell mr-2"></i>건강 관리 알림
+                            </h3>
+                            <div class="space-y-2 text-sm" id="healthReminders">
+                                <!-- 알림이 여기에 표시됩니다 -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 최근 건강 기록 -->
+                    <div class="mt-6 bg-gray-50 rounded-lg p-4">
+                        <h3 class="font-semibold text-gray-800 mb-3">
+                            <i class="fas fa-history mr-2"></i>최근 건강 기록
+                        </h3>
+                        <div id="recentHealthRecords" class="space-y-2">
+                            <!-- 최근 기록이 여기에 표시됩니다 -->
+                        </div>
+                    </div>
+                </div>
+            `;
+            openModal();
+            
+            // 오늘 날짜 설정
+            document.getElementById('healthDate').value = new Date().toISOString().split('T')[0];
+            
+            // 건강 알림과 최근 기록 로드
+            loadHealthReminders();
+            loadRecentHealthRecords();
         }
         
         // 모프 검색 기능
@@ -810,13 +1628,14 @@
         }
         
         // 수동 동기화 함수
-        function manualSync() {
-            if (window.firebaseSync) {
+        window.manualSync = function() {
+            if (window.firebaseSync && typeof window.firebaseSync.manualSync === 'function') {
                 window.firebaseSync.manualSync();
             } else {
+                console.warn('동기화 시스템을 찾을 수 없습니다.');
                 alert('동기화 시스템이 아직 초기화되지 않았습니다. 잠시 후 다시 시도해주세요.');
             }
-        }
+        };
         
         // 사용자 메뉴 토글
         function toggleUserMenu() {
@@ -827,7 +1646,7 @@
         // 외부 클릭 시 메뉴 닫기
         document.addEventListener('click', function(e) {
             const menu = document.getElementById('userMenu');
-            const button = e.target.closest('button[onclick="toggleUserMenu()"]');
+            const button = e.target.closest('button[onclick*="toggleUserMenu"]');
             
             if (!button && menu && !menu.contains(e.target)) {
                 menu.classList.add('hidden');
@@ -835,23 +1654,31 @@
         });
         
         // 대량 가져오기 처리
-        async function handleBulkImport(input) {
+        window.handleBulkImport = async function(input) {
             const file = input.files[0];
             if (!file) return;
             
             try {
-                document.getElementById('importProgress').classList.remove('hidden');
+                const progressElement = document.getElementById('importProgress');
+                if (progressElement) {
+                    progressElement.classList.remove('hidden');
+                }
                 
                 console.log('📁 파일 처리 시작:', file.name);
-                await window.bulkDataManager.importFromFile(file);
+                
+                if (window.bulkDataManager && typeof window.bulkDataManager.importFromFile === 'function') {
+                    await window.bulkDataManager.importFromFile(file);
+                } else {
+                    throw new Error('대량 데이터 관리자를 찾을 수 없습니다.');
+                }
                 
                 // UI 새로고침
-                if (window.updateStatistics) {
+                if (typeof window.updateStatistics === 'function') {
                     window.updateStatistics();
                 }
                 
                 // 개체 목록이 열려있으면 새로고침
-                if (document.getElementById('animalListContainer')) {
+                if (document.getElementById('animalListContainer') && typeof window.loadAnimalList === 'function') {
                     window.loadAnimalList();
                 }
                 
@@ -859,17 +1686,20 @@
                 console.error('대량 가져오기 실패:', error);
                 alert('파일 처리 중 오류가 발생했습니다: ' + error.message);
                 
-                document.getElementById('importProgress').innerHTML = `
-                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-                        <div class="flex items-center">
-                            <i class="fas fa-exclamation-circle text-red-600 mr-2"></i>
-                            <span class="text-red-800 font-semibold">오류 발생</span>
+                const progressElement = document.getElementById('importProgress');
+                if (progressElement) {
+                    progressElement.innerHTML = `
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-exclamation-circle text-red-600 mr-2"></i>
+                                <span class="text-red-800 font-semibold">오류 발생</span>
+                            </div>
+                            <p class="text-sm text-red-700 mt-1">${error.message}</p>
                         </div>
-                        <p class="text-sm text-red-700 mt-1">${error.message}</p>
-                    </div>
-                `;
+                    `;
+                }
             }
-        }
+        };
     </script>
 </body>
 </html>

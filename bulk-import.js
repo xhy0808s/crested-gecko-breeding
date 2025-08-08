@@ -1,9 +1,41 @@
 // 대량 데이터 가져오기 및 최적화 시스템
+// 전역 오류 처리
+window.addEventListener('error', function(e) {
+    console.error('전역 오류:', e.error);
+});
+
+window.addEventListener('unhandledrejection', function(e) {
+    console.error('처리되지 않은 Promise 오류:', e.reason);
+});
 class BulkDataManager {
     constructor() {
+        // 보안 검사
+        this.validateSecurity();
+        
+        // 설정
         this.batchSize = 10; // 한 번에 처리할 개체 수
         this.compressionLevel = 0.7; // 이미지 압축 품질
         this.maxImageSize = 200; // 최대 이미지 크기 (KB)
+    }
+    
+    // 보안 검사 함수
+    validateSecurity() {
+        if (typeof window === 'undefined') {
+            throw new Error('브라우저 환경이 아닙니다.');
+        }
+        
+        // CSP 위반 방지를 위한 기본 검사
+        try {
+            const testDiv = document.createElement('div');
+            testDiv.innerHTML = '<span>test</span>';
+            if (!testDiv.querySelector('span')) {
+                throw new Error('DOM 조작이 제한되어 있습니다.');
+            }
+        } catch (e) {
+            throw new Error('보안 정책으로 인해 실행할 수 없습니다.');
+        }
+        
+        return true;
     }
     
     // Excel/CSV 파일에서 대량 데이터 가져오기
@@ -393,4 +425,23 @@ class BulkDataManager {
 
 // 전역에서 사용할 수 있도록 내보내기
 window.BulkDataManager = BulkDataManager;
-window.bulkDataManager = new BulkDataManager();
+
+// 안전한 초기화
+try {
+    window.bulkDataManager = new BulkDataManager();
+    console.log('✅ 대량 데이터 관리자 초기화 완료');
+} catch (error) {
+    console.error('❌ 대량 데이터 관리자 초기화 실패:', error);
+    // 비상 모드로 기본 객체 생성
+    window.bulkDataManager = {
+        importFromFile: function() {
+            throw new Error('대량 데이터 관리자가 올바르게 초기화되지 않았습니다.');
+        },
+        downloadTemplate: function() {
+            alert('템플릿 다운로드를 사용할 수 없습니다.');
+        },
+        exportData: function() {
+            alert('데이터 내보내기를 사용할 수 없습니다.');
+        }
+    };
+}
