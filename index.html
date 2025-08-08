@@ -166,16 +166,43 @@
             transform: scale(1.1);
         }
         
-        /* 터치 디바이스에서 호버 효과 개선 */
+        /* 터치 디바이스 최적화 */
         @media (hover: none) and (pointer: coarse) {
             .feature-card:hover {
                 transform: none;
+                box-shadow: var(--shadow);
             }
             
             .feature-card:active {
-                transform: translateY(1px);
+                transform: scale(0.95);
                 background-color: var(--gray-50);
+                box-shadow: var(--shadow);
             }
+            
+            /* 모바일에서 버튼 터치 피드백 */
+            button:active {
+                transform: scale(0.95);
+                opacity: 0.8;
+            }
+            
+            /* 터치 시 스크롤 방지 */
+            .feature-card {
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+            }
+            
+            button {
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+            }
+        }
+        
+        /* 모바일에서 텍스트 선택 방지 */
+        .feature-card, .feature-title, .feature-description {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         .feature-icon {
@@ -388,42 +415,57 @@
     </style>
 </head>
 <body>
-    <!-- 헤더 -->
+    <!-- 헤더 - 모바일 최적화 -->
     <header class="header">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
-                <div class="flex items-center space-x-4">
-                    <div class="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl">
-                        <i class="fas fa-dragon text-white text-xl"></i>
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-3">
+                <!-- 로고 및 제목 -->
+                <div class="flex items-center space-x-2 sm:space-x-4">
+                    <div class="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl">
+                        <i class="fas fa-dragon text-white text-sm sm:text-xl"></i>
                     </div>
-                    <h1 class="text-xl font-bold text-gray-900">크레스티드 게코 브리딩 시스템</h1>
+                    <h1 class="text-sm sm:text-xl font-bold text-gray-900">크레스티드 게코</h1>
                 </div>
-                <div class="flex items-center space-x-4">
+                
+                <!-- 모바일 상태 표시 -->
+                <div class="flex items-center space-x-1 sm:space-x-4">
+                    <!-- 사용자 정보 -->
                     <div id="userInfo" class="hidden sm:block">
                         <!-- 사용자 정보가 여기에 표시됩니다 -->
                     </div>
-                    <div id="syncStatus" class="text-xs sm:text-sm hidden sm:block">
-                        <span class="text-gray-600">
-                            ⏳ 동기화 준비중
-                        </span>
+                    
+                    <!-- 동기화 상태 (모바일에서는 아이콘만) -->
+                    <div id="syncStatus" class="text-xs">
+                        <span class="text-gray-600 sm:hidden">⏳</span>
+                        <span class="text-gray-600 hidden sm:inline">⏳ 동기화 준비중</span>
                     </div>
-                    <div class="flex space-x-2">
+                    
+                    <!-- 액션 버튼들 -->
+                    <div class="flex space-x-1 sm:space-x-2">
                         <!-- PWA 설치 버튼 -->
-                        <button id="pwaInstallBtn" onclick="installPWA()" class="btn-primary hidden">
-                            <i class="fas fa-download mr-1"></i>앱 설치
+                        <button id="pwaInstallBtn" onclick="installPWA()" class="btn-primary hidden text-xs sm:text-sm px-2 sm:px-4">
+                            <i class="fas fa-download"></i>
+                            <span class="hidden sm:inline ml-1">앱 설치</span>
                         </button>
-                        <button onclick="manualSync()" class="btn-primary">
-                            <i class="fas fa-sync mr-1"></i>동기화
+                        
+                        <!-- 동기화 버튼 -->
+                        <button onclick="manualSync()" class="btn-primary text-xs sm:text-sm px-2 sm:px-4">
+                            <i class="fas fa-sync"></i>
+                            <span class="hidden sm:inline ml-1">동기화</span>
                         </button>
+                        
+                        <!-- 메뉴 버튼 -->
                         <div class="relative">
-                            <button onclick="toggleUserMenu()" class="btn-secondary">
-                                <i class="fas fa-user mr-1"></i>설정
+                            <button onclick="toggleUserMenu()" class="btn-secondary text-xs sm:text-sm px-2 sm:px-4">
+                                <i class="fas fa-bars sm:hidden"></i>
+                                <i class="fas fa-user hidden sm:inline"></i>
+                                <span class="hidden sm:inline ml-1">설정</span>
                             </button>
-                            <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-                                <button onclick="changeUser()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <div id="userMenu" class="hidden absolute right-0 mt-2 w-40 sm:w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                                <button onclick="changeUser()" class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-lg">
                                     <i class="fas fa-user-switch mr-2"></i>사용자 변경
                                 </button>
-                                <button onclick="logout()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <button onclick="logout()" class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg">
                                     <i class="fas fa-sign-out-alt mr-2"></i>로그아웃
                                 </button>
                             </div>
@@ -496,86 +538,86 @@
             </div>
         </section>
 
-        <!-- 주요 기능 -->
-        <section class="mb-8">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">주요 기능</h2>
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                <button onclick="showAnimalRegistrationModal()" class="feature-card">
+        <!-- 주요 기능 - 모바일 최적화 -->
+        <section class="mb-6">
+            <h2 class="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 px-1">🦎 주요 기능</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+                <button onclick="showAnimalRegistrationModal()" class="feature-card" type="button">
                     <div class="feature-icon text-green-600">
                         <i class="fas fa-plus-circle"></i>
                     </div>
-                    <div class="feature-title">개체 등록</div>
-                    <div class="feature-description">새로운 개체 등록</div>
+                    <div class="feature-title text-xs sm:text-sm">개체 등록</div>
+                    <div class="feature-description text-xs hidden sm:block">새로운 개체 등록</div>
                 </button>
                 
-                <button onclick="showAnimalListModal()" class="feature-card">
+                <button onclick="showAnimalListModal()" class="feature-card" type="button">
                     <div class="feature-icon text-blue-600">
                         <i class="fas fa-list"></i>
                     </div>
-                    <div class="feature-title">개체 목록</div>
-                    <div class="feature-description">등록된 개체 관리</div>
+                    <div class="feature-title text-xs sm:text-sm">개체 목록</div>
+                    <div class="feature-description text-xs hidden sm:block">등록된 개체 관리</div>
                 </button>
                 
-                <button onclick="showBabyModal()" class="feature-card">
+                <button onclick="showBabyModal()" class="feature-card" type="button">
                     <div class="feature-icon text-pink-600">
                         <i class="fas fa-baby"></i>
                     </div>
-                    <div class="feature-title">베이비 등록</div>
-                    <div class="feature-description">새 베이비 등록</div>
+                    <div class="feature-title text-xs sm:text-sm">베이비 등록</div>
+                    <div class="feature-description text-xs hidden sm:block">새 베이비 등록</div>
                 </button>
                 
-                <button onclick="showBabyListModal()" class="feature-card">
+                <button onclick="showBabyListModal()" class="feature-card" type="button">
                     <div class="feature-icon text-red-600">
                         <i class="fas fa-heart"></i>
                     </div>
-                    <div class="feature-title">베이비 목록</div>
-                    <div class="feature-description">베이비 관리</div>
+                    <div class="feature-title text-xs sm:text-sm">베이비 목록</div>
+                    <div class="feature-description text-xs hidden sm:block">베이비 관리</div>
                 </button>
                 
-                <button onclick="showSoldListModal()" class="feature-card">
+                <button onclick="showSoldListModal()" class="feature-card" type="button">
                     <div class="feature-icon text-blue-600">
                         <i class="fas fa-handshake"></i>
                     </div>
-                    <div class="feature-title">분양 완료</div>
-                    <div class="feature-description">분양 완료 목록</div>
+                    <div class="feature-title text-xs sm:text-sm">분양 완료</div>
+                    <div class="feature-description text-xs hidden sm:block">분양 완료 목록</div>
                 </button>
                 
-                <button onclick="showBulkImportModal()" class="feature-card">
+                <button onclick="showBulkImportModal()" class="feature-card" type="button">
                     <div class="feature-icon text-purple-600">
                         <i class="fas fa-file-import"></i>
                     </div>
-                    <div class="feature-title">대량 가져오기</div>
-                    <div class="feature-description">CSV/Excel 가져오기</div>
+                    <div class="feature-title text-xs sm:text-sm">대량 가져오기</div>
+                    <div class="feature-description text-xs hidden sm:block">CSV/Excel 가져오기</div>
                 </button>
             </div>
         </section>
 
-        <!-- 고급 기능 -->
-        <section class="mb-8">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">고급 기능</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button onclick="showMorphCalculatorModal()" class="feature-card">
-                    <div class="feature-icon text-purple-600">
+        <!-- 고급 기능 - 모바일 최적화 -->
+        <section class="mb-6">
+            <h2 class="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 px-1">⚡ 고급 기능</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                <button onclick="showMorphCalculatorModal()" class="feature-card h-24 sm:h-auto" type="button">
+                    <div class="feature-icon text-purple-600 text-lg sm:text-2xl">
                         <i class="fas fa-calculator"></i>
                     </div>
-                    <div class="feature-title">모프 계산기</div>
-                    <div class="feature-description">유전 조합 예측</div>
+                    <div class="feature-title text-sm sm:text-base">모프 계산기</div>
+                    <div class="feature-description text-xs hidden sm:block">유전 조합 예측</div>
                 </button>
                 
-                <button onclick="showFamilyTreeModal()" class="feature-card">
-                    <div class="feature-icon text-teal-600">
+                <button onclick="showFamilyTreeModal()" class="feature-card h-24 sm:h-auto" type="button">
+                    <div class="feature-icon text-teal-600 text-lg sm:text-2xl">
                         <i class="fas fa-sitemap"></i>
                     </div>
-                    <div class="feature-title">혈통 트리</div>
-                    <div class="feature-description">혈통 관계 조회</div>
+                    <div class="feature-title text-sm sm:text-base">혈통 트리</div>
+                    <div class="feature-description text-xs hidden sm:block">혈통 관계 조회</div>
                 </button>
                 
-                <button onclick="showHealthManagementModal()" class="feature-card">
-                    <div class="feature-icon text-red-600">
+                <button onclick="showHealthManagementModal()" class="feature-card h-24 sm:h-auto" type="button">
+                    <div class="feature-icon text-red-600 text-lg sm:text-2xl">
                         <i class="fas fa-heartbeat"></i>
                     </div>
-                    <div class="feature-title">건강 관리</div>
-                    <div class="feature-description">건강 기록 관리</div>
+                    <div class="feature-title text-sm sm:text-base">건강 관리</div>
+                    <div class="feature-description text-xs hidden sm:block">건강 기록 관리</div>
                 </button>
             </div>
         </section>
@@ -824,9 +866,78 @@
             }
         });
         
+        // 모바일 터치 이벤트 최적화
+        function addTouchSupport() {
+            // 기능 버튼들에 직접 이벤트 리스너 추가
+            const functionMap = {
+                'showAnimalRegistrationModal': () => showAnimalRegistrationModal(),
+                'showAnimalListModal': () => showAnimalListModal(),
+                'showBabyModal': () => showBabyModal(),
+                'showBabyListModal': () => showBabyListModal(),
+                'showSoldListModal': () => showSoldListModal(),
+                'showBulkImportModal': () => showBulkImportModal(),
+                'showMorphCalculatorModal': () => showMorphCalculatorModal(),
+                'showFamilyTreeModal': () => showFamilyTreeModal(),
+                'showHealthManagementModal': () => showHealthManagementModal(),
+                'manualSync': () => manualSync(),
+                'installPWA': () => installPWA(),
+                'toggleUserMenu': () => toggleUserMenu(),
+                'changeUser': () => changeUser(),
+                'logout': () => logout()
+            };
+            
+            // 모든 onclick 버튼에 터치 및 클릭 이벤트 추가
+            const buttons = document.querySelectorAll('button[onclick], .feature-card');
+            
+            buttons.forEach(button => {
+                const onclickAttr = button.getAttribute('onclick');
+                
+                if (onclickAttr) {
+                    // 함수명 추출
+                    const funcName = onclickAttr.replace(/\(\).*/, '').trim();
+                    
+                    // 터치와 클릭 모두 지원
+                    const handleAction = (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        // 시각적 피드백
+                        button.style.transform = 'scale(0.95)';
+                        setTimeout(() => {
+                            button.style.transform = 'scale(1)';
+                        }, 150);
+                        
+                        // 함수 실행
+                        try {
+                            if (functionMap[funcName]) {
+                                functionMap[funcName]();
+                            } else {
+                                // 대체 방법으로 window에서 함수 찾기
+                                if (typeof window[funcName] === 'function') {
+                                    window[funcName]();
+                                } else {
+                                    console.warn('함수를 찾을 수 없음:', funcName);
+                                }
+                            }
+                        } catch (error) {
+                            console.error('버튼 실행 오류:', error);
+                            showToast('기능 실행 중 오류가 발생했습니다.', 'error');
+                        }
+                    };
+                    
+                    // 클릭과 터치 이벤트 모두 처리
+                    button.addEventListener('click', handleAction);
+                    button.addEventListener('touchend', handleAction, { passive: false });
+                }
+            });
+        }
+
         // DOM 준비 완료 시 초기화
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🎉 DOM 준비 완료');
+            
+            // 모바일 터치 지원 추가
+            addTouchSupport();
             
             // 통계 업데이트 함수 확인 및 실행
             const initializeStats = () => {

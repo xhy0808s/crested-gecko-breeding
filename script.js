@@ -42,6 +42,160 @@ window.closeModal = function() {
     }
 };
 
+// 모달 표시 함수들
+window.showAnimalRegistrationModal = function() {
+    // 개체 등록 모달 내용 생성
+    const modalContent = document.getElementById('modalContent');
+    modalContent.innerHTML = `
+        <div class="p-4 sm:p-6">
+            <div class="flex justify-between items-center mb-4 sm:mb-6">
+                <h2 class="text-lg sm:text-xl font-bold text-gray-900">
+                    <i class="fas fa-plus-circle mr-2 text-green-600"></i>개체 등록
+                </h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 p-2">
+                    <i class="fas fa-times text-lg sm:text-xl"></i>
+                </button>
+            </div>
+            
+            <form class="space-y-4" onsubmit="registerAnimal(); return false;">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">개체 이름 *</label>
+                    <input type="text" id="animalName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base" required placeholder="예: Luna-01">
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">성별 *</label>
+                        <select id="animalGender" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base" required>
+                            <option value="">선택하세요</option>
+                            <option value="수컷">수컷 ♂</option>
+                            <option value="암컷">암컷 ♀</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">세대 *</label>
+                        <select id="animalGeneration" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base" required>
+                            <option value="">선택하세요</option>
+                            <option value="F1">F1 (1세대)</option>
+                            <option value="F2">F2 (2세대)</option>
+                            <option value="F3">F3 (3세대)</option>
+                            <option value="F4">F4 (4세대)</option>
+                            <option value="F5">F5 (5세대)</option>
+                            <option value="F6">F6 (6세대)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">모프</label>
+                    <input type="text" id="animalMorphSearch" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base" placeholder="예: 노멀, 릴리화이트, 달마시안">
+                    <input type="hidden" id="animalMorph">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">이미지</label>
+                    <input type="file" id="animalImage" accept="image/*" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base">
+                    <p class="text-xs text-gray-500 mt-1">선택사항. 5MB 이하의 이미지 파일</p>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 pt-4">
+                    <button type="button" onclick="closeModal()" class="px-4 py-3 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 text-base">
+                        취소
+                    </button>
+                    <button type="submit" class="px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 text-base">
+                        <i class="fas fa-plus mr-2"></i>등록하기
+                    </button>
+                </div>
+            </form>
+        </div>
+    `;
+    
+    openModal();
+};
+
+window.showAnimalListModal = function() {
+    const modalContent = document.getElementById('modalContent');
+    modalContent.innerHTML = `
+        <div class="p-4 sm:p-6">
+            <div class="flex justify-between items-center mb-4 sm:mb-6">
+                <h2 class="text-lg sm:text-xl font-bold text-gray-900">
+                    <i class="fas fa-list mr-2 text-blue-600"></i>개체 목록
+                </h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 p-2">
+                    <i class="fas fa-times text-lg sm:text-xl"></i>
+                </button>
+            </div>
+            
+            <div id="animalListContainer" class="max-h-96 overflow-y-auto">
+                <!-- 개체 목록이 여기에 로드됩니다 -->
+            </div>
+        </div>
+    `;
+    
+    openModal();
+    
+    // 개체 목록 로드
+    if (typeof window.loadAnimalList === 'function') {
+        window.loadAnimalList();
+    }
+};
+
+window.showBabyModal = function() {
+    showToast('베이비 등록 기능을 준비 중입니다.', 'info');
+};
+
+window.showBabyListModal = function() {
+    showToast('베이비 목록 기능을 준비 중입니다.', 'info');
+};
+
+window.showSoldListModal = function() {
+    showToast('분양 완료 목록을 준비 중입니다.', 'info');
+};
+
+window.showBulkImportModal = function() {
+    showToast('대량 가져오기 기능을 준비 중입니다.', 'info');
+};
+
+window.showMorphCalculatorModal = function() {
+    showToast('모프 계산기를 준비 중입니다.', 'info');
+};
+
+window.showFamilyTreeModal = function() {
+    showToast('혈통 트리 기능을 준비 중입니다.', 'info');
+};
+
+window.showHealthManagementModal = function() {
+    showToast('건강 관리 기능을 준비 중입니다.', 'info');
+};
+
+window.manualSync = function() {
+    showToast('수동 동기화를 실행합니다.', 'info');
+    if (window.firebaseSync && typeof window.firebaseSync.processSyncQueue === 'function') {
+        window.firebaseSync.processSyncQueue();
+    }
+};
+
+window.toggleUserMenu = function() {
+    const userMenu = document.getElementById('userMenu');
+    if (userMenu) {
+        userMenu.classList.toggle('hidden');
+    }
+};
+
+window.changeUser = function() {
+    showToast('사용자 변경 기능을 준비 중입니다.', 'info');
+    toggleUserMenu();
+};
+
+window.logout = function() {
+    if (confirm('로그아웃하시겠습니까?')) {
+        localStorage.removeItem('currentUser');
+        location.reload();
+    }
+    toggleUserMenu();
+};
+
 // 토스트 알림 시스템
 window.showToast = function(message, type = 'info') {
     const toastId = 'toast-' + Date.now();
@@ -61,10 +215,10 @@ window.showToast = function(message, type = 'info') {
     
     const toast = document.createElement('div');
     toast.id = toastId;
-    toast.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 max-w-sm transform translate-x-full transition-transform duration-300 ${toastColors[type]}`;
+    toast.className = `fixed top-4 left-4 right-4 sm:top-4 sm:right-4 sm:left-auto p-3 sm:p-4 rounded-lg shadow-lg z-50 sm:max-w-sm transform translate-x-full transition-transform duration-300 ${toastColors[type]}`;
     toast.innerHTML = `
-        <div class="flex items-center space-x-3">
-            <i class="${toastIcons[type]}"></i>
+        <div class="flex items-center space-x-2 sm:space-x-3">
+            <i class="${toastIcons[type]} text-sm sm:text-base"></i>
             <span class="text-sm font-medium">${message}</span>
         </div>
     `;
