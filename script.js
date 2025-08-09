@@ -404,13 +404,21 @@ window.saveAnimal = async function(name, gender, generation, morph, imageData) {
             throw new Error('데이터 저장에 실패했습니다.');
         }
         
-        // Firebase 동기화 (에러 방지)
+        // Firebase 동기화 강화
         try {
             if (window.firebaseSync && typeof window.firebaseSync.saveToCloud === 'function') {
                 await window.firebaseSync.saveToCloud('animals', animals);
+                console.log('✅ Firebase 동기화 성공 (개체)');
+            } else {
+                console.warn('⚠️ Firebase 동기화 불가 - 연결 상태 확인');
+                // Firebase 재초기화 시도
+                if (window.initializeFirebase) {
+                    setTimeout(() => window.initializeFirebase(), 1000);
+                }
             }
         } catch (error) {
-            console.warn('Firebase 동기화 실패 (개체):', error.message);
+            console.error('❌ Firebase 동기화 실패 (개체):', error.message);
+            showToast('클라우드 동기화에 실패했지만 로컬에는 저장되었습니다.', 'warning');
         }
         
         showToast('개체가 성공적으로 등록되었습니다!', 'success');
@@ -4009,7 +4017,7 @@ window.loadBabyList = function() {
 };
 
 // 안전한 초기화 및 에러 방지
-window.safeInit = function() {
+window.safeInit = async function() {
     try {
         // 모든 필수 함수들이 존재하는지 확인
         const requiredFunctions = [
@@ -4026,6 +4034,17 @@ window.safeInit = function() {
         
         if (missingFunctions.length > 0) {
             console.warn('누락된 함수들:', missingFunctions);
+        }
+        
+        // Firebase에서 데이터 동기화 시도
+        try {
+            if (window.firebaseSync && typeof window.firebaseSync.manualSync === 'function') {
+                console.log('🔄 Firebase 데이터 동기화 중...');
+                await window.firebaseSync.manualSync();
+                console.log('✅ Firebase 동기화 완료');
+            }
+        } catch (error) {
+            console.warn('⚠️ Firebase 동기화 실패:', error.message);
         }
         
         // 통계 업데이트
