@@ -235,7 +235,7 @@ class BulkDataManager {
     async saveOptimizedData(key, data) {
         try {
             // 데이터 압축 (불필요한 필드 제거)
-            const compressedData = data.map(item => {
+            const compressedData = await Promise.all(data.map(async item => {
                 const compressed = { ...item };
                 
                 // 빈 값 제거
@@ -251,7 +251,7 @@ class BulkDataManager {
                 }
                 
                 return compressed;
-            });
+            }));
             
             localStorage.setItem(key, JSON.stringify(compressedData));
             

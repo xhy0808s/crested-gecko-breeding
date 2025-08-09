@@ -1299,7 +1299,7 @@ window.promoteToAdult = function(babyId) {
     }
 };
 
-window.confirmPromoteToAdult = function(babyId) {
+window.confirmPromoteToAdult = async function(babyId) {
     try {
         console.log('confirmPromoteToAdult 시작:', babyId);
         

@@ -7,7 +7,6 @@ const urlsToCache = [
   './script.js',
   './firebase-sync.js', 
   './bulk-import.js',
-  './user-auth.js',
   './manifest.json',
   './icons/icon-192x192.png',
   './icons/icon-512x512.svg',
@@ -23,10 +22,18 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('📦 캐시 파일 추가 중...');
-        return cache.addAll(urlsToCache).catch(err => {
-          console.warn('일부 파일 캐시 실패:', err);
-          // 중요하지 않은 파일은 무시하고 진행
+        // 중요한 파일들을 개별적으로 캐시하여 일부 실패해도 계속 진행
+        const cachePromises = urlsToCache.map(url => {
+          return cache.add(url).catch(error => {
+            console.warn(`캐시 실패 (계속 진행): ${url}`, error.message);
+            // 개별 파일 실패는 무시하고 계속 진행
+          });
         });
+        return Promise.allSettled(cachePromises);
+      })
+      .catch(error => {
+        console.error('캐시 초기화 실패:', error);
+        // 캐시 실패해도 서비스 워커는 설치 진행
       })
   );
   self.skipWaiting(); // 즉시 활성화
@@ -84,19 +91,44 @@ self.addEventListener('fetch', (event) => {
             return response;
           }
           
-          const responseToCache = response.clone();
-          caches.open(CACHE_NAME)
-            .then((cache) => {
-              cache.put(event.request, responseToCache);
-            });
+          // 캐시 크기 제한을 위해 안전하게 저장
+          try {
+            const responseToCache = response.clone();
+            caches.open(CACHE_NAME)
+              .then((cache) => {
+                return cache.put(event.request, responseToCache);
+              })
+              .catch(error => {
+                console.warn('캐시 저장 실패 (계속 진행):', error.message);
+              });
+          } catch (error) {
+            console.warn('응답 복제 실패 (계속 진행):', error.message);
+          }
             
           return response;
+        }).catch(networkError => {
+          console.warn('네트워크 요청 실패:', event.request.url, networkError.message);
+          throw networkError; // 상위 catch로 전달
         });
       }).catch(() => {
         // 오프라인 시 기본 페이지 반환
         if (event.request.destination === 'document') {
-          return caches.match('./index.html');
+          return caches.match('./index.html').catch(() => {
+            // index.html도 캐시에 없으면 기본 오프라인 페이지
+            return new Response(`
+              <!DOCTYPE html>
+              <html><head><title>오프라인</title></head>
+              <body>
+                <h1>오프라인 상태입니다</h1>
+                <p>인터넷 연결을 확인하고 새로고침해주세요.</p>
+              </body></html>
+            `, {
+              headers: { 'Content-Type': 'text/html' }
+            });
+          });
         }
+        // 기타 리소스는 실패 응답
+        return new Response('오프라인 상태', { status: 503 });
       })
   );
 });
@@ -134,7 +166,7 @@ self.addEventListener('push', (event) => {
   const options = {
     body: data.body || '새로운 알림이 있습니다',
     icon: './icons/icon-192x192.png',
-    badge: './icons/icon-96x96.png',
+    badge: './icons/icon-192x192.png',
     tag: 'gecko-notification',
     vibrate: [200, 100, 200],
     data: data,
@@ -142,7 +174,7 @@ self.addEventListener('push', (event) => {
       {
         action: 'view',
         title: '확인',
-        icon: './icons/icon-96x96.png'
+        icon: './icons/icon-192x192.png'
       },
       {
         action: 'dismiss',
