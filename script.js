@@ -404,11 +404,28 @@ window.saveAnimal = async function(name, gender, generation, morph, imageData) {
             throw new Error('데이터 저장에 실패했습니다.');
         }
         
-        // Firebase 동기화 강화
+        // Firebase 동기화 강화 - 즉시 업로드 및 전체 동기화
         try {
             if (window.firebaseSync && typeof window.firebaseSync.saveToCloud === 'function') {
+                // 1. 즉시 클라우드에 저장
                 await window.firebaseSync.saveToCloud('animals', animals);
                 console.log('✅ Firebase 동기화 성공 (개체)');
+                
+                // 2. 다른 디바이스 동기화를 위한 강제 업데이트 트리거
+                if (window.firebaseSync.triggerRealtimeUpdate) {
+                    await window.firebaseSync.triggerRealtimeUpdate('animals');
+                }
+                
+                // 3. 잠시 후 전체 동기화 실행 (다른 디바이스 데이터 확인)
+                setTimeout(async () => {
+                    if (window.firebaseSync && window.firebaseSync.downloadFromCloud) {
+                        await window.firebaseSync.downloadFromCloud();
+                        if (window.updateStatistics) {
+                            window.updateStatistics();
+                        }
+                    }
+                }, 2000);
+                
             } else {
                 console.warn('⚠️ Firebase 동기화 불가 - 연결 상태 확인');
                 // Firebase 재초기화 시도
@@ -4042,6 +4059,25 @@ window.safeInit = async function() {
                 console.log('🔄 Firebase 데이터 동기화 중...');
                 await window.firebaseSync.manualSync();
                 console.log('✅ Firebase 동기화 완료');
+                
+                // 자동 동기화 주기 설정 (30초마다)
+                if (!window.autoSyncInterval) {
+                    window.autoSyncInterval = setInterval(async () => {
+                        try {
+                            if (window.firebaseSync && window.firebaseSync.downloadFromCloud) {
+                                await window.firebaseSync.downloadFromCloud();
+                                // UI가 보이는 경우에만 조용히 업데이트
+                                if (!document.hidden && window.updateStatistics) {
+                                    window.updateStatistics();
+                                }
+                            }
+                        } catch (error) {
+                            console.warn('자동 동기화 실패:', error.message);
+                        }
+                    }, 30000); // 30초마다
+                    
+                    console.log('🔄 자동 동기화 시작 (30초 주기)');
+                }
             }
         } catch (error) {
             console.warn('⚠️ Firebase 동기화 실패:', error.message);
@@ -4062,4 +4098,24 @@ window.safeInit = async function() {
 // 페이지 로드 시 통계 업데이트
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(window.safeInit, 1500);
+});
+
+// 페이지 포커스 시 동기화 (다른 디바이스에서 변경된 내용 반영)
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+        // 페이지가 다시 포커스되면 동기화
+        setTimeout(async () => {
+            try {
+                if (window.firebaseSync && window.firebaseSync.downloadFromCloud) {
+                    await window.firebaseSync.downloadFromCloud();
+                    if (window.updateStatistics) {
+                        window.updateStatistics();
+                    }
+                    console.log('🔄 페이지 포커스 시 동기화 완료');
+                }
+            } catch (error) {
+                console.warn('페이지 포커스 동기화 실패:', error.message);
+            }
+        }, 500);
+    }
 });
