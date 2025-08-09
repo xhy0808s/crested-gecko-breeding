@@ -149,7 +149,7 @@ class CloudSync {
                        class="w-full p-3 border rounded-lg mb-4" onpaste="setTimeout(() => this.value = this.value.trim(), 10)">
                 
                 <div class="flex gap-2">
-                    <button onclick="this.joinFromInput()" class="btn btn-primary flex-1">
+                    <button onclick="window.joinFromInput()" class="btn btn-primary flex-1">
                         참여하기
                     </button>
                     <button onclick="window.closeModal()" class="btn btn-secondary flex-1">
